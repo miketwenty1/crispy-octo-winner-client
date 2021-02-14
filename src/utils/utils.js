@@ -63,7 +63,7 @@ export function getCookie(cname) {
 
 export function refreshTokenInterval() {
   setInterval(() => {
-    postData(`${SERVER_URL}/token`, { refreshToken: getCookie('refreshJwt') })
+    postData(`${process.env.SERVER_URL}/token`, { refreshToken: getCookie('refreshJwt') })
       .then(() => {})
       .catch((error) => {
         console.log(error.message);

@@ -25,7 +25,7 @@ const config = {
 class Game extends Phaser.Game {
   constructor() {
     super(config);
-    const socket = io(SERVER_URL);
+    const socket = io(process.env.SERVER_URL);
     this.globals = { socket };
     this.scene.start('Boot');
   }
