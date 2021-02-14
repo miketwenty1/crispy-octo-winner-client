@@ -1,9 +1,9 @@
 #!/bin/bash
 
 npm run build
-rm -rf ../server/public/
-mkdir ../server/public
+rm -rf ../crispy-octo-winner/public/
+mkdir ../crispy-octo-winner/public
 
-cp -R assets ../server/public/assets/
-cp -R build ../server/public/build/
-cp index.html ../server/public/index.html
+cp -R assets ../crispy-octo-winner/public/assets/
+cp -R build ../crispy-octo-winner/public/build/
+cp index.html ../crispy-octo-winner/public/index.html
