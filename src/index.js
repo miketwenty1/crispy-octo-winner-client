@@ -1,6 +1,9 @@
 import * as Phaser from 'phaser';
 import io from 'socket.io-client';
 import scenes from './scenes/scenes';
+// import 'dotenv/config';
+
+// const SERVER_URL = 'http://localhost:4000'; // why is dotenv not working?
 
 const config = {
   type: Phaser.AUTO,
@@ -24,6 +27,7 @@ const config = {
 
 class Game extends Phaser.Game {
   constructor() {
+    console.log(`this is the server url ${process.env.SERVER_URL}`);
     super(config);
     const socket = io(process.env.SERVER_URL);
     this.globals = { socket };

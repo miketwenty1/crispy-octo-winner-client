@@ -1,3 +1,5 @@
+// import 'dotenv/config';
+
 export function postData(url, data = {}) {
   return fetch(url, {
     method: 'POST',
