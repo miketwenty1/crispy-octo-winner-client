@@ -27,9 +27,9 @@ const config = {
 
 class Game extends Phaser.Game {
   constructor() {
-    console.log(`this is the server url ${process.env.SERVER_URL}`);
+    console.log(`this is the server url ${SERVER_URL}`); // process.env.SERVER_URL
     super(config);
-    const socket = io(process.env.SERVER_URL);
+    const socket = io(SERVER_URL); // process.env.SERVER_URL
     this.globals = { socket };
     this.scene.start('Boot');
   }
