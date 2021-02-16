@@ -15,11 +15,11 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   create() {
-    this.titleText = this.add.text(this.scale.width / 2, this.scale.height / 2 - 300, 'Hunt 4 BTC', {
+    this.titleText = this.add.text(this.scale.width / 2, 100, 'Hunt 4 BTC', {
       fontSize: '64px',
       fill: '#6f6f6f',
     });
-    this.instructionText = this.add.text(this.scale.width / 2, this.scale.height * 0.80 - 200, instructions,
+    this.instructionText = this.add.text(this.scale.width / 2, this.scale.height * 0.65, instructions,
       {
         fontSize: '24px',
         fill: '#6f6f6f',
@@ -29,7 +29,7 @@ export default class TitleScene extends Phaser.Scene {
     this.startGameButton = new UiButton(
       this,
       this.scale.width / 2,
-      this.scale.height * 0.65 - 200,
+      this.scale.height * 0.45,
       'button1',
       'button2',
       'Play as Guest',
@@ -37,7 +37,7 @@ export default class TitleScene extends Phaser.Scene {
     );
     this.loginButton = new UiButton(
       this,
-      this.scale.width / 2 - 150,
+      this.scale.width * 0.32,
       this.scale.height * 0.35,
       'button1',
       'button2',
@@ -47,7 +47,7 @@ export default class TitleScene extends Phaser.Scene {
     // sign up button
     this.SignUpButton = new UiButton(
       this,
-      this.scale.width / 2 + 150,
+      this.scale.width * 0.68,
       this.scale.height * 0.35,
       'button1',
       'button2',
