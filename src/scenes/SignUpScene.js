@@ -1,48 +1,72 @@
-import * as Phaser from 'phaser';
-import UiButton from '../classes/UiButton';
+import CredentialsBaseScene from './CredentialsBaseScene';
+import {
+  postData, createLabel, createInputField, createBrElement,
+} from '../utils/utils';
 
-export default class SignUpScene extends Phaser.Scene {
+export default class SignUpScene extends CredentialsBaseScene {
   constructor() {
     super('SignUp');
   }
 
   create() {
-    this.titleText = this.add.text(this.scale.width / 2, this.scale.height / 2 - 300, 'Hunt 4 BTC', {
-      fontSize: '64px',
-      fill: '#6f6f6f',
-    });
-    this.titleText.setOrigin(0.5);
-    this.startGameButton = new UiButton(
-      this,
-      this.scale.width / 2,
-      this.scale.height * 0.65 - 200,
-      'button1',
-      'button2',
-      'Play as Guest',
-      this.startScene.bind(this, 'Game'),
+    this.createUi(
+      'Create User',
+      this.signUp.bind(this),
+      'Back',
+      this.startScene.bind(this, 'Title'),
     );
-    this.loginButton = new UiButton(
-      this,
-      this.scale.width / 2 - 150,
-      this.scale.height * 0.35,
-      'button1',
-      'button2',
-      'Login',
-      this.startScene.bind(this, 'Login'),
-    );
-    // sign up button
-    this.SignUpButton = new UiButton(
-      this,
-      this.scale.width / 2 + 150,
-      this.scale.height * 0.35,
-      'button1',
-      'button2',
-      'Sign Up',
-      this.startScene.bind(this, 'SignUp'),
-    );
+    this.createSignupSpecificInput();
   }
 
-  startScene(targetScene) {
-    this.scene.start(targetScene);
+  createSignupSpecificInput() {
+    this.loginUsernameLabel = createLabel('username', 'Username:', 'form-label');
+    this.loginUsernameInput = createInputField('text', 'username', 'username', 'login-input', 'Username');
+    this.loginPasswordLabelRe = createLabel('passwordRe', 'Verify Password:', 'form-label');
+    this.loginPasswordInputRe = createInputField('password', 'passwordRe', 'passwordRe', 'login-input');
+    this.div.append(createBrElement());
+    this.div.append(this.loginPasswordLabelRe);
+    this.div.append(createBrElement());
+    this.div.append(this.loginPasswordInputRe);
+    this.div.append(createBrElement());
+    this.div.append(createBrElement());
+    this.div.append(this.loginUsernameLabel);
+    this.div.append(createBrElement());
+    this.div.append(this.loginUsernameInput);
+  }
+
+  signUp() {
+    const emailValue = this.loginEmailInput.value;
+    const passwordValue = this.loginPasswordInput.value;
+    const passwordValueRe = this.loginPasswordInputRe.value;
+    const usernameValue = this.loginUsernameInput.value;
+
+    console.log(usernameValue);
+
+    if (emailValue && passwordValue && passwordValueRe && usernameValue) {
+      if (passwordValueRe !== passwordValue) {
+        window.alert('Passwords do not match');
+      } else {
+        postData(`${SERVER_URL}/signup`, {
+          email: emailValue,
+          username: usernameValue,
+          password: passwordValue,
+        })
+          .then((res) => {
+            if (res.status === 200) {
+              this.startScene('Login');
+            } else {
+              console.log(res);
+              console.log(`did not get a 200 response got ${res.status}, -> ${res.message}`);
+              window.alert('Invalid username or password');
+            }
+          })
+          .catch((err) => {
+            console.log(`yo there an err for login - ${err.message}`);
+            window.alert('Invalid username or password');
+          });
+      }
+    } else {
+      window.alert('Need to fill out all fields');
+    }
   }
 }

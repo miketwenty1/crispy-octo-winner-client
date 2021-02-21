@@ -1,13 +1,17 @@
 import * as Phaser from 'phaser';
 import UiButton from '../classes/UiButton';
+import { getParam } from '../utils/utils';
 
-const instructions = `  * ~ * ~ * ~ * ~ * Instructions * ~ * ~ * ~ * ~ *
+const instructions = `  * ~ * ~ Instructions ~ * ~ *
 
-Use arrow keys or WASD to move, Spacebar to attack.
-Monsters drop large amounts of gold, but beware they
-do attack back. Gain heath by killing monsters.
-Death from monster results in 50% loss of Bitcoins.
-Steal 100% of a player's Bitcoins by killing them.`;
+Use arrow keys or WASD to move,
+Spacebar to attack. Monsters drop
+large amounts of gold, but beware
+they do attack back. Gain heath
+by killing monsters. Death from
+monster results in 50% loss of
+Bitcoins.Steal 100% of a player's
+Bitcoins by killing them.`;
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -15,13 +19,13 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   create() {
-    this.titleText = this.add.text(this.scale.width / 2, 100, 'Hunt 4 BTC', {
-      fontSize: '64px',
+    this.titleText = this.add.text(this.scale.width / 2, 50, 'Hunt 4 BTC', {
+      fontSize: '32px',
       fill: '#6f6f6f',
     });
-    this.instructionText = this.add.text(this.scale.width / 2, this.scale.height * 0.65, instructions,
+    this.instructionText = this.add.text(this.scale.width * 0.5, this.scale.height * 0.65, instructions,
       {
-        fontSize: '24px',
+        fontSize: '15px',
         fill: '#6f6f6f',
       });
     this.titleText.setOrigin(0.5);
@@ -54,6 +58,11 @@ export default class TitleScene extends Phaser.Scene {
       'Sign Up',
       this.startScene.bind(this, 'SignUp'),
     );
+    const resetPasswordSceneCheck = getParam('scene');
+    console.log(`hello there ${resetPasswordSceneCheck}`);
+    if (resetPasswordSceneCheck && resetPasswordSceneCheck === 'resetPassword') {
+      this.scene.start('ResetPassword');
+    }
   }
 
   startScene(targetScene) {

@@ -1,86 +1,48 @@
-import * as Phaser from 'phaser';
-import UiButton from '../classes/UiButton';
+import { postData } from '../utils/utils';
+import CredentialsBaseScene from './CredentialsBaseScene';
 
-export default class LoginScene extends Phaser.Scene {
+export default class LoginScene extends CredentialsBaseScene {
   constructor() {
     super('Login');
   }
 
   create() {
-    this.titleText = this.add.text(this.scale.width / 2, 100, 'Hunt 4 BTC', {
-      fontSize: '64px',
+    this.titleText = this.add.text(this.scale.width / 2, 50, 'Hunt 4 BTC', {
+      fontSize: '32px',
       fill: '#6f6f6f',
     });
     this.titleText.setOrigin(0.5);
-    this.ForgotPasswordButton = new UiButton(
-      this,
-      this.scale.width / 2,
-      this.scale.height * 0.65 - 200,
-      'button1',
-      'button2',
+
+    this.createUi(
+      'Login',
+      this.login.bind(this),
       'Forgot Password',
       this.startScene.bind(this, 'ForgotPassword'),
-    );
-    this.backButton = new UiButton(
-      this,
-      this.scale.width / 2,
-      this.scale.height * 0.55,
-      'button1',
-      'button2',
       'Back',
       this.startScene.bind(this, 'Title'),
     );
-    this.createInput();
   }
 
-  createInput() {
-    const div = document.createElement('div');
-    div.className = 'input-div';
-    this.div = div;
-
-    // EMAIL
-    const label = document.createElement('label');
-    label.for = 'login';
-    label.innerText = 'Email:';
-    label.className = 'form-label';
-    this.loginEmailLabel = label;
-
-    const inputField = document.createElement('input');
-    inputField.type = 'text';
-    inputField.name = 'login';
-    inputField.id = 'login';
-    inputField.className = 'login-input';
-    inputField.placeHolder = 'Email Address';
-    this.loginEmailInput = inputField;
-
-    // PASSWORD
-    const label2 = document.createElement('label');
-    label2.for = 'password';
-    label2.innerText = 'Password:';
-    label2.className = 'form-label';
-    this.loginPasswordLabel = label2;
-
-    const inputField2 = document.createElement('input');
-    inputField2.type = 'password';
-    inputField2.name = 'password';
-    inputField2.id = 'password';
-    inputField2.className = 'login-input';
-    this.loginPasswordInput = inputField2;
-
-    this.div.append(this.loginEmailLabel);
-    this.div.append(document.createElement('br'));
-    this.div.append(this.loginEmailInput);
-    this.div.append(document.createElement('br'));
-    this.div.append(document.createElement('br'));
-    this.div.append(this.loginPasswordLabel);
-    this.div.append(document.createElement('br'));
-    this.div.append(this.loginPasswordInput);
-
-    document.body.appendChild(this.div);
-  }
-
-  startScene(targetScene) {
-    this.div.parentNode.removeChild(this.div);
-    this.scene.start(targetScene);
+  login() {
+    const emailValue = this.loginEmailInput.value;
+    const passwordValue = this.loginPasswordInput.value;
+    if (emailValue && passwordValue) {
+      postData(`${SERVER_URL}/login`, { email: emailValue, password: passwordValue })
+        .then((res) => {
+          if (res.status === 200) {
+            this.startScene('Game');
+          } else {
+            console.log(res);
+            console.log(`did not get a 200 response got ${res.status}, -> ${res.message}`);
+            window.alert('Invalid username or password');
+          }
+        })
+        .catch((err) => {
+          console.log(`yo there an err for login - ${err.message}`);
+          window.alert('Invalid username or password');
+        });
+    } else {
+      window.alert('Need to fill out all fields');
+    }
   }
 }
