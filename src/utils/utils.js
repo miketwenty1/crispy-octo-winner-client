@@ -1,6 +1,7 @@
 // import 'dotenv/config';
 
 export function postData(url, data = {}) {
+  // console.log(`the magic url is ${url}`);
   return fetch(url, {
     method: 'POST',
     mode: 'cors',

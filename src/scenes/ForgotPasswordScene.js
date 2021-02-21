@@ -27,6 +27,7 @@ export default class ForgotPasswordScene extends CredentialsBaseScene {
   resetPassword() {
     const emailValue = this.loginEmailInput.value;
     if (emailValue) {
+      console.log(`this is the server url ${SERVER_URL}`);
       postData(`${SERVER_URL}/forgot-password`, { email: emailValue })
         .then((res) => {
           if (res.status === 200) {
