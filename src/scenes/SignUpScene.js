@@ -61,7 +61,7 @@ export default class SignUpScene extends CredentialsBaseScene {
             }
           })
           .catch((err) => {
-            console.log(`yo there an err for login - ${err.message}`);
+            console.log(`yo there an err for signup - ${err.message}`);
             window.alert('Invalid username or password');
           });
       }

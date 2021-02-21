@@ -158,6 +158,7 @@ export default class GameScene extends Phaser.Scene {
     this.createGroups();
     // emit event that a new player joined
     this.socket.emit('newPlayer', getCookie('jwt'));
+    // console.log(`emitting event "newPlayer" with jwt Value ${getCookie('jwt')}`);
   }
 
   update() {
