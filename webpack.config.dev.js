@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
-const Dotenv = require('dotenv-webpack');
+// const Dotenv = require('dotenv-webpack');
+require('dotenv').config();
 
 // DEV
 module.exports = {
@@ -30,14 +31,18 @@ module.exports = {
     ],
   },
   plugins: [
-    new webpack.EnvironmentPlugin({ ...process.env }),
+    // new webpack.EnvironmentPlugin({ ...process.env }),
     new webpack.DefinePlugin({
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true),
-      SERVER_URL: JSON.stringify('http://localhost:4000'),
-    }),
-    new Dotenv({
+      // SERVER_URL: JSON.stringify('http://localhost:4000'),
+      SERVER_URL: JSON.stringify(process.env.SERVER_URL),
+      // TOKEN_INTERVAL: JSON.stringify('3000'),
       TOKEN_INTERVAL: JSON.stringify(process.env.TOKEN_INTERVAL),
     }),
+    // can't figure out how to make this work
+    // new Dotenv({
+    //   TOKEN_INTERVAL: JSON.stringify(process.env.TOKEN_INTERVAL),
+    // }),
   ],
 };

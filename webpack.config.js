@@ -33,7 +33,10 @@ module.exports = {
     new webpack.DefinePlugin({
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true),
-      SERVER_URL: JSON.stringify('https://friday-nightz.herokuapp.com'),
+      // SERVER_URL: JSON.stringify('https://friday-nightz.herokuapp.com'),
+      SERVER_URL: JSON.stringify(process.env.SERVER_URL),
+      // TOKEN_INTERVAL: JSON.stringify('3000'),
+      TOKEN_INTERVAL: JSON.stringify(process.env.TOKEN_INTERVAL),
     }),
   ],
 };

@@ -59,7 +59,7 @@ export default class TitleScene extends Phaser.Scene {
       this.startScene.bind(this, 'SignUp'),
     );
     const resetPasswordSceneCheck = getParam('scene');
-    console.log(`hello there ${resetPasswordSceneCheck}`);
+    // console.log(`hello there ${resetPasswordSceneCheck}`);
     if (resetPasswordSceneCheck && resetPasswordSceneCheck === 'resetPassword') {
       this.scene.start('ResetPassword');
     }

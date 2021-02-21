@@ -4,6 +4,7 @@ import Chest from '../classes/Chest';
 import Monster from '../classes/Monster';
 import GameMap from '../classes/GameMap';
 import { Scale, AUDIO_LEVEL } from '../game_manager/utils';
+import { getCookie } from '../utils/utils';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -135,13 +136,18 @@ export default class GameScene extends Phaser.Scene {
         });
       }
     });
-    // TODO fix this disconnect event currently doesn't work!
+
     this.socket.on('playerDisconnect', (playerId) => {
       this.otherPlayers.getChildren().forEach((player) => {
         if (playerId === player.id) {
           player.cleanUp();
         }
       });
+    });
+
+    this.socket.on('invalidToken', () => {
+      window.alert('invalid token log in again por FaVoR');
+      window.location.reload();
     });
   }
 
@@ -151,7 +157,7 @@ export default class GameScene extends Phaser.Scene {
     this.createInput();
     this.createGroups();
     // emit event that a new player joined
-    this.socket.emit('newPlayer', { test: '1234' });
+    this.socket.emit('newPlayer', getCookie('jwt'));
   }
 
   update() {

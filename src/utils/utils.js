@@ -47,13 +47,14 @@ export function getParam(param) {
   return params.get(param);
 }
 
+// cname will ultimately end up being the refreshToken or the jwt (cookie name)
 export function getCookie(cname) {
   const name = `${cname}=`;
   const decodedCookie = decodeURIComponent(document.cookie);
   const ca = decodedCookie.split(';');
   for (let i = 0; i < ca.length; i += 1) {
     let c = ca[i];
-    while (c.charAt(0) === ' ') {
+    while (c.charAt(0) === ' ') { // there are random spaces between the different split values of the cookie
       c = c.substring(1);
     }
     if (c.indexOf(name) === 0) {
@@ -65,7 +66,7 @@ export function getCookie(cname) {
 
 export function refreshTokenInterval() {
   setInterval(() => {
-    postData(`${process.env.SERVER_URL}/token`, { refreshToken: getCookie('refreshJwt') })
+    postData(`${SERVER_URL}/token`, { refreshToken: getCookie('refreshJwt') })
       .then(() => {})
       .catch((error) => {
         console.log(error.message);
