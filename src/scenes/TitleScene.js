@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import UiButton from '../classes/UiButton';
-import { getParam } from '../utils/utils';
+import { getParam, postData } from '../utils/utils';
 
 const instructions = `  * ~ * ~ Instructions ~ * ~ *
 
@@ -37,7 +37,7 @@ export default class TitleScene extends Phaser.Scene {
       'button1',
       'button2',
       'Play as Guest',
-      this.startScene.bind(this, 'Game'),
+      this.loginAsGuest.bind(this),
     );
     this.loginButton = new UiButton(
       this,
@@ -63,6 +63,23 @@ export default class TitleScene extends Phaser.Scene {
     if (resetPasswordSceneCheck && resetPasswordSceneCheck === 'resetPassword') {
       this.scene.start('ResetPassword');
     }
+  }
+
+  loginAsGuest() {
+    postData(`${SERVER_URL}/login`, { email: 'guest', password: 'guest' })
+      .then((res) => {
+        if (res.status === 200) {
+          this.startScene('Game');
+        } else {
+          console.log(res);
+          console.log(`did not get a 200 response got ${res.status}, -> ${res.message}`);
+          window.alert('something wrong happened with guest login contact admin');
+        }
+      })
+      .catch((err) => {
+        console.log(`yo there an err for login - ${err.message}`);
+        window.alert('something bizarre happened with guest login ..like wtf');
+      });
   }
 
   startScene(targetScene) {
