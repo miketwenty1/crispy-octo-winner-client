@@ -30,6 +30,7 @@ export default class CharacterSelectionScene extends Phaser.Scene {
 
       for (let i = 0 + (8 * j); i < 8 + (8 * j); i += 1) {
         const character = this.add.image(x, y, 'characters', i).setInteractive();
+        character.characterId = i;
         character.setScale(3);
         character.setAlpha(0.4);
         character.on('pointerover', this.pointerover);
@@ -49,9 +50,9 @@ export default class CharacterSelectionScene extends Phaser.Scene {
     this.setAlpha(0.4);
   }
 
-  pointerdown() {
+  pointerdown(character) {
     this.scale.removeListener('resize', this.resize);
-    this.scene.start('Game');
+    this.scene.start('Game', { selectedCharacter: character.characterId });
   }
 
   resize(gameSize) {

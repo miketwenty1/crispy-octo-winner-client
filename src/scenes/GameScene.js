@@ -11,12 +11,15 @@ export default class GameScene extends Phaser.Scene {
     super('Game');
   }
 
-  init() {
+  init(data) {
     this.scene.launch('Ui');
     // get a reference to the socket
     this.socket = this.sys.game.globals.socket;
     // listen for socket events
     this.listenForSocketEvents();
+
+    this.selectedCharacter = data.selectedCharacter || 6;
+    console.log(`this is the data: ${JSON.stringify(data)}`);
   }
 
   listenForSocketEvents() {
@@ -26,6 +29,7 @@ export default class GameScene extends Phaser.Scene {
       console.log(players);
       Object.keys(players).forEach((id) => {
         if (players[id].id === this.socket.id) {
+          console.log(players[id]);
           this.createPlayer(players[id], true);
           this.addCollisions();
         } else {
@@ -157,7 +161,8 @@ export default class GameScene extends Phaser.Scene {
     this.createInput();
     this.createGroups();
     // emit event that a new player joined
-    this.socket.emit('newPlayer', getCookie('jwt'));
+    this.socket.emit('newPlayer', getCookie('jwt'), this.selectedCharacter);
+    console.log(`this is the selected char going to create() - ${this.selectedCharacter}`);
     // NOT SURE HOW this is working with this code being commented out
     // this.scale.on('resize', this.resize, this);
     // this.resize({ width: this.scale.width, height: this.scale.height });
@@ -215,13 +220,13 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createPlayer(playerObject, mainPlayer) {
-    console.log(playerObject);
+    console.log(`the player object: ${JSON.stringify(playerObject)}`);
     const playerGameObject = new PlayerContainer(
       this,
       playerObject.x * Scale.FACTOR,
       playerObject.y * Scale.FACTOR,
       'characters',
-      5,
+      playerObject.frame,
       playerObject.health,
       playerObject.maxHealth,
       playerObject.id,

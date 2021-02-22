@@ -24,7 +24,7 @@ export default class LoginScene extends CredentialsBaseScene {
       postData(`${SERVER_URL}/login`, { email: emailValue, password: passwordValue })
         .then((res) => {
           if (res.status === 200) {
-            this.startScene('Game');
+            this.startScene('CharacterSelection');
           } else {
             console.log(res);
             console.log(`did not get a 200 response got ${res.status}, -> ${res.message}`);
