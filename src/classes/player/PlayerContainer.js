@@ -7,7 +7,7 @@ const Scale = {
 };
 
 export default class PlayerContainer extends Phaser.GameObjects.Container {
-  constructor(scene, x, y, key, frame, health, maxHealth, id, attackAudio, mainPlayer) {
+  constructor(scene, x, y, key, frame, health, maxHealth, id, attackAudio, mainPlayer, username) {
     super(scene, x, y);
     this.scene = scene;
     this.velocity = 360;
@@ -20,6 +20,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.id = id;
     this.attackAudio = attackAudio;
     this.mainPlayer = mainPlayer;
+    this.username = username;
 
     this.setSize(32 * Scale.FACTOR, 32 * Scale.FACTOR);
     this.scene.physics.world.enable(this);
@@ -43,6 +44,23 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.add(this.weapon);
     this.weapon.alpha = 0;
     this.createHealthBar();
+    this.createUsernameText();
+  }
+
+  createUsernameText() {
+    this.usernameText = this.scene.make.text({
+      x: this.x - 32,
+      y: this.y - 60,
+      text: this.username,
+      style: {
+        font: '14px monospace',
+        fill: '#fff',
+      },
+    });
+  }
+
+  updateUsernameTextPosition() {
+    this.usernameText.setPosition(this.x - 32, this.y - 60);
   }
 
   createHealthBar() {
@@ -68,6 +86,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.health = playerObject.health;
     this.setPosition(playerObject.x * Scale.FACTOR, playerObject.y * Scale.FACTOR);
     this.updateHealthBar();
+    this.updateUsernameTextPosition();
   }
 
   update(cursors) {
@@ -133,6 +152,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
       }
     }
     this.updateHealthBar();
+    this.updateUsernameTextPosition();
   }
 
   updateFlipX() {
@@ -155,6 +175,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
   cleanUp() {
     this.healthBar.destroy();
     this.player.destroy();
+    this.usernameText.destroy();
     this.destroy();
   }
 }

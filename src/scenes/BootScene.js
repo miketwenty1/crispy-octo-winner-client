@@ -48,6 +48,6 @@ export default class BootScene extends Phaser.Scene {
     console.log('Loading Game');
     // this.scene.start('Game');
     // this.scene.start('Title');
-    this.scene.start('Title');
+    this.scene.start('CharacterSelection');
   }
 }

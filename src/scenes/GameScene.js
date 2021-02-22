@@ -158,7 +158,9 @@ export default class GameScene extends Phaser.Scene {
     this.createGroups();
     // emit event that a new player joined
     this.socket.emit('newPlayer', getCookie('jwt'));
-    // console.log(`emitting event "newPlayer" with jwt Value ${getCookie('jwt')}`);
+    // NOT SURE HOW this is working with this code being commented out
+    // this.scale.on('resize', this.resize, this);
+    // this.resize({ width: this.scale.width, height: this.scale.height });
   }
 
   update() {
@@ -213,6 +215,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createPlayer(playerObject, mainPlayer) {
+    console.log(playerObject);
     const playerGameObject = new PlayerContainer(
       this,
       playerObject.x * Scale.FACTOR,
@@ -224,6 +227,7 @@ export default class GameScene extends Phaser.Scene {
       playerObject.id,
       this.playerAttackAudio,
       mainPlayer, // true if main player
+      playerObject.username,
     );
     if (!mainPlayer) {
       this.otherPlayers.add(playerGameObject);
@@ -354,4 +358,9 @@ export default class GameScene extends Phaser.Scene {
     // create map
     this.gameMap = new GameMap(this, 'map', 'background', 'background', 'blocked');
   }
+
+  // resize(gameSize) {
+  //   const { width, height } = gameSize;
+  //   this.cameras.resize(width, height);
+  // }
 }

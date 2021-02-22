@@ -7,8 +7,8 @@ import scenes from './scenes/scenes';
 
 const config = {
   type: Phaser.AUTO,
-  width: window.innerWidth, // 800,
-  height: window.innerHeight, // 600,
+  // width: window.innerWidth, // 800,
+  // height: window.innerHeight, // 600,
   scene: scenes,
   physics: {
     default: 'arcade',
@@ -18,6 +18,12 @@ const config = {
         y: 0,
       },
     },
+  },
+  scale: {
+    width: '100%', // window.innerWidth,
+    height: '100%', // window.innerHeight,
+    mode: Phaser.Scale.RESIZE,
+    parent: 'phaser-game',
   },
   // to get rid of grainy look when we scale up tiles
   pixelArt: true,

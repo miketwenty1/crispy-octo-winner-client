@@ -15,6 +15,8 @@ export default class SignUpScene extends CredentialsBaseScene {
       'Back',
       this.startScene.bind(this, 'Title'),
     );
+    this.Button1.setY(this.scale.height * 0.71);
+    this.Button2.setY(this.scale.height * 0.82);
     this.createSignupSpecificInput();
   }
 

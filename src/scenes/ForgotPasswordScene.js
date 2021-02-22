@@ -7,12 +7,6 @@ export default class ForgotPasswordScene extends CredentialsBaseScene {
   }
 
   create() {
-    this.titleText = this.add.text(this.scale.width / 2, 50, 'Hunt 4 BTC', {
-      fontSize: '32px',
-      fill: '#6f6f6f',
-    });
-    this.titleText.setOrigin(0.5);
-
     this.createUi(
       'Reset Password',
       this.resetPassword.bind(this),
