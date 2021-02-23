@@ -16,7 +16,10 @@ export default class Monster extends Phaser.Physics.Arcade.Image {
     this.scene.physics.world.enable(this);
     this.setImmovable(false);
     this.setScale(Scale.FACTOR * 2);
+    // apparently this doesn't work because monsters are in a group
     this.setCollideWorldBounds(true);
+    // this doesn't do anything
+    // this.body.setCollideWorldBounds(true);
     this.body.setAllowGravity(false);
     this.scene.add.existing(this);
     this.createHealthBar();

@@ -23,7 +23,6 @@ export default class GameScene extends Phaser.Scene {
     } else {
       this.selectedCharacter = data.selectedCharacter || 6;
     }
-    console.log(`this is the data: ${JSON.stringify(data)}`);
   }
 
   listenForSocketEvents() {
@@ -98,6 +97,10 @@ export default class GameScene extends Phaser.Scene {
           }
         });
       });
+      // THIS IS EXCESSIVE not sure how else to make monsters stay in the world
+      this.monsters.getChildren().forEach((monster) => {
+        monster.body.collideWorldBounds = true;
+      });
     });
     this.socket.on('chestRemoved', (chestId) => {
       this.chests.getChildren().forEach((chest) => {
@@ -164,9 +167,9 @@ export default class GameScene extends Phaser.Scene {
     this.createAudio();
     this.createInput();
     this.createGroups();
+
     // emit event that a new player joined
     this.socket.emit('newPlayer', getCookie('jwt'), this.selectedCharacter);
-    console.log(`this is the selected char going to create() - ${this.selectedCharacter}`);
     // NOT SURE HOW this is working with this code being commented out
     // this.scale.on('resize', this.resize, this);
     // this.resize({ width: this.scale.width, height: this.scale.height });
@@ -325,6 +328,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.gameMap.blockedLayer);
     this.physics.add.overlap(this.player, this.chests, this.collectChest, null, this);
     this.physics.add.collider(this.monsters, this.gameMap.blockedLayer);
+    // this seems to be necessary because monsters still escaping
     this.physics.add.overlap(this.player.weapon, this.monsters, this.enemyOverlap, null, this);
     // add collisions for players to each other
     this.physics.add.collider(this.otherPlayers, this.player, this.pvpCollider, false, this);

@@ -1,6 +1,5 @@
 import { v4 } from 'uuid';
-import Scale from '../utils/scale';
-import { randomNumber } from './utils';
+import { randomNumber, Scale } from './utils';
 
 export default class MonsterModel {
   constructor(x, y, bitcoin, spawnerId, frame, health, attack) {

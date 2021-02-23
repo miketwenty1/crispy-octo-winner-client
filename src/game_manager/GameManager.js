@@ -1,7 +1,8 @@
 import Spawner from './Spawner';
 import PlayerModel from './PlayerModel';
-
-import { SpawnerType, Mode, DIFFICULTY } from './utils';
+import {
+  SpawnerType, Mode, DIFFICULTY, Scale,
+} from './utils';
 
 export default class GameManager {
   constructor(scene, mapData) {
@@ -28,22 +29,22 @@ export default class GameManager {
     this.mapData.forEach((layer) => {
       if (layer.name === 'player_locations') {
         layer.objects.forEach((obj) => {
-          this.playerLocations.push([obj.x, obj.y]);
+          this.playerLocations.push([obj.x * Scale.FACTOR, obj.y * Scale.FACTOR]);
         });
       } else if (layer.name === 'chest_locations') {
         layer.objects.forEach((obj) => {
           if (this.chestLocations[obj.properties.spawner]) {
-            this.chestLocations[obj.properties.spawner].push([obj.x, obj.y]);
+            this.chestLocations[obj.properties.spawner].push([obj.x * Scale.FACTOR, obj.y * Scale.FACTOR]);
           } else {
-            this.chestLocations[obj.properties.spawner] = [[obj.x, obj.y]];
+            this.chestLocations[obj.properties.spawner] = [[obj.x * Scale.FACTOR, obj.y * Scale.FACTOR]];
           }
         });
       } else if (layer.name === 'monster_locations') {
         layer.objects.forEach((obj) => {
           if (this.monsterLocations[obj.properties.spawner]) {
-            this.monsterLocations[obj.properties.spawner].push([obj.x, obj.y]);
+            this.monsterLocations[obj.properties.spawner].push([obj.x * Scale.FACTOR, obj.y * Scale.FACTOR]);
           } else {
-            this.monsterLocations[obj.properties.spawner] = [[obj.x, obj.y]];
+            this.monsterLocations[obj.properties.spawner] = [[obj.x * Scale.FACTOR, obj.y * Scale.FACTOR]];
           }
         });
       }
