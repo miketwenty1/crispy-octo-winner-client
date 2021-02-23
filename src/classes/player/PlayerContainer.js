@@ -26,6 +26,10 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.setSize(32 * Scale.FACTOR, 32 * Scale.FACTOR);
     this.scene.physics.world.enable(this);
     this.body.setCollideWorldBounds(true);
+    // true isn't working for some reason.
+    // i should be able to avoid offset and just use this.body.setSize(40, 55, true);
+    this.body.setSize(40, 55);
+    this.body.setOffset((64 - 40) / 2, (64 - 55) / 2);
     this.body.setAllowGravity(false);
     this.scene.add.existing(this);
 
