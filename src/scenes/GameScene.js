@@ -17,8 +17,12 @@ export default class GameScene extends Phaser.Scene {
     this.socket = this.sys.game.globals.socket;
     // listen for socket events
     this.listenForSocketEvents();
-
-    this.selectedCharacter = data.selectedCharacter || 6;
+    if (data.selectedCharacter === 0) {
+      // this is done because 0 is a logical false apparently
+      this.selectedCharacter = 0;
+    } else {
+      this.selectedCharacter = data.selectedCharacter || 6;
+    }
     console.log(`this is the data: ${JSON.stringify(data)}`);
   }
 
