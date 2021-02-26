@@ -1,7 +1,9 @@
 // import 'dotenv/config';
-
+export const AUDIO_LEVEL = 0.5;
+export const Scale = {
+  FACTOR: 2,
+};
 export function postData(url, data = {}) {
-  // console.log(`the magic url is ${url}`);
   return fetch(url, {
     method: 'POST',
     mode: 'cors',

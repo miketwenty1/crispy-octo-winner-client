@@ -3,8 +3,7 @@ import PlayerContainer from '../classes/player/PlayerContainer';
 import Chest from '../classes/Chest';
 import Monster from '../classes/Monster';
 import GameMap from '../classes/GameMap';
-import { Scale, AUDIO_LEVEL } from '../game_manager/utils';
-import { getCookie } from '../utils/utils';
+import { getCookie, AUDIO_LEVEL } from '../utils/utils';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -28,11 +27,8 @@ export default class GameScene extends Phaser.Scene {
   listenForSocketEvents() {
     // spawn player game objects
     this.socket.on('currentPlayers', (players) => {
-      console.log('currentPlayers');
-      console.log(players);
       Object.keys(players).forEach((id) => {
         if (players[id].id === this.socket.id) {
-          console.log(players[id]);
           this.createPlayer(players[id], true);
           this.addCollisions();
         } else {
@@ -74,7 +70,6 @@ export default class GameScene extends Phaser.Scene {
       this.spawnChest(chest);
     });
     this.socket.on('monsterSpawned', (monster) => {
-      // console.log('spawned:'+monster);
       this.spawnMonster(monster);
     });
     this.socket.on('monsterRemoved', (monsterId) => {
@@ -86,14 +81,19 @@ export default class GameScene extends Phaser.Scene {
       });
     });
     this.socket.on('monsterMovement', (monsters) => {
+      console.log(monsters);
       this.monsters.getChildren().forEach((monster) => {
         Object.keys(monsters).forEach((monsterId) => {
+          // console.log(monsterId);
           if (monster.id === monsterId) {
             // better than setPosition() because it will use physics and is smoother
             // the 1st argument is for what is moving
             // 2nd argument must contain an x.y coordinate
             // 3rd arg is velocity
-            this.physics.moveToObject(monster, monsters[monsterId], 40);
+            console.log('monsters mVelocity');
+            console.log(monster);
+            console.log(monster.mVelocity);
+            this.physics.moveToObject(monster, monsters[monsterId], monster.velocity);
           }
         });
       });
@@ -227,11 +227,12 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createPlayer(playerObject, mainPlayer) {
-    console.log(`the player object: ${JSON.stringify(playerObject)}`);
     const playerGameObject = new PlayerContainer(
       this,
-      playerObject.x * Scale.FACTOR,
-      playerObject.y * Scale.FACTOR,
+      // playerObject.x * Scale.FACTOR,
+      // playerObject.y * Scale.FACTOR,
+      playerObject.x,
+      playerObject.y,
       'characters',
       playerObject.frame,
       playerObject.health,
@@ -259,14 +260,12 @@ export default class GameScene extends Phaser.Scene {
   }
 
   spawnChest(chestObject) {
-    // console.log(location);
     let chest = this.chests.getFirstDead();
     if (!chest) {
-      // console.log('create new chest');
       chest = new Chest(
         this,
-        chestObject.x * Scale.FACTOR,
-        chestObject.y * Scale.FACTOR,
+        chestObject.x,
+        chestObject.y,
         'items',
         0,
         chestObject.bitcoin,
@@ -274,10 +273,9 @@ export default class GameScene extends Phaser.Scene {
       );
       this.chests.add(chest);
     } else {
-      // console.log('reposition dead chest');
       chest.coin = chestObject.bitcoin;
       chest.id = chestObject.id;
-      chest.setPosition(chestObject.x * Scale.FACTOR, chestObject.y * Scale.FACTOR);
+      chest.setPosition(chestObject.x, chestObject.y);
       chest.makeActive();
     }
   }
@@ -285,7 +283,6 @@ export default class GameScene extends Phaser.Scene {
   spawnMonster(monsterObject) {
     let monster = this.monsters.getFirstDead();
     if (!monster) {
-      // console.log(monsterObject);
       monster = new Monster(
         this,
         monsterObject.x,
@@ -296,6 +293,7 @@ export default class GameScene extends Phaser.Scene {
         monsterObject.health,
         monsterObject.attack,
         monsterObject.maxHealth,
+        monsterObject.mVelocity,
       );
       this.monsters.add(monster);
     } else {
@@ -357,7 +355,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   collectChest(player, chest) {
-    // console.log('collected chest');
     // chest.makeInactive();  this now done by chest event listener on chestRemoved
     // this.score += chest.coins commenting this out because now it exist in the player model
     // this.events.emit('updateBalance', this.score);  this also taken out and put game manager

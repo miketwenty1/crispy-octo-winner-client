@@ -1,6 +1,4 @@
-const Scale = {
-  FACTOR: 2,
-};
+import { Scale } from '../utils/utils';
 
 export default class GameMap {
   // this, 'map', 'backgound', 'backgound', 'blocked');
@@ -23,10 +21,10 @@ export default class GameMap {
     // name of layer in tile file, tiles, x-starting position, y-starting position
     console.log(this.bgLayerName);
     this.backgroundLayer = this.tileMap.createLayer(this.bgLayerName, this.tiles, 0, 0);
-    this.backgroundLayer.setScale(2);
+    this.backgroundLayer.setScale(Scale.FACTOR);
     // create blocklayer
     this.blockedLayer = this.tileMap.createLayer(this.blockedLayerName, this.tiles, 0, 0);
-    this.blockedLayer.setScale(2);
+    this.blockedLayer.setScale(Scale.FACTOR);
     // -1 (default all in the layer)
     this.blockedLayer.setCollisionByExclusion([-1]);
 

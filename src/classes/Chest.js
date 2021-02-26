@@ -1,8 +1,5 @@
 import * as Phaser from 'phaser';
-
-const Scale = {
-  FACTOR: 2,
-};
+import { Scale } from '../utils/utils';
 
 export default class Chest extends Phaser.Physics.Arcade.Image {
   constructor(scene, x, y, key, frame, coins, id) {

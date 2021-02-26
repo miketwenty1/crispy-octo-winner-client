@@ -1,17 +1,15 @@
 import * as Phaser from 'phaser';
-
-const Scale = {
-  FACTOR: 2,
-};
+import { Scale } from '../utils/utils';
 
 export default class Monster extends Phaser.Physics.Arcade.Image {
-  constructor(scene, x, y, key, frame, id, health, attack, maxHealth) {
+  constructor(scene, x, y, key, frame, id, health, attack, maxHealth, mVelocity) {
     super(scene, x, y, key, frame);
 
     this.scene = scene;
     this.id = id;
     this.health = health;
     this.maxHealth = maxHealth;
+    this.mVelocity = mVelocity;
 
     this.scene.physics.world.enable(this);
     this.setImmovable(false);

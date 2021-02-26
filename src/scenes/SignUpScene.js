@@ -41,9 +41,6 @@ export default class SignUpScene extends CredentialsBaseScene {
     const passwordValue = this.loginPasswordInput.value;
     const passwordValueRe = this.loginPasswordInputRe.value;
     const usernameValue = this.loginUsernameInput.value;
-
-    console.log(usernameValue);
-
     if (emailValue && passwordValue && passwordValueRe && usernameValue) {
       if (passwordValueRe !== passwordValue) {
         window.alert('Passwords do not match');
@@ -57,7 +54,6 @@ export default class SignUpScene extends CredentialsBaseScene {
             if (res.status === 200) {
               this.startScene('Login');
             } else {
-              console.log(res);
               console.log(`did not get a 200 response got ${res.status}, -> ${res.message}`);
               window.alert('Invalid username or password');
             }

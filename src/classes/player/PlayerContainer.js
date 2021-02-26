@@ -1,16 +1,14 @@
 import * as Phaser from 'phaser';
 import Player from './Player';
 import Direction from '../../utils/direction';
-
-const Scale = {
-  FACTOR: 2,
-};
+import { Scale } from '../../utils/utils';
 
 export default class PlayerContainer extends Phaser.GameObjects.Container {
   constructor(scene, x, y, key, frame, health, maxHealth, id, attackAudio, mainPlayer, username) {
     super(scene, x, y);
     this.scene = scene;
-    this.velocity = 360;
+    // 32 for the pixels of the base sprites, 2.7 to get the scale with 2 to be about 360
+    this.velocity = Scale.FACTOR * 32 * ((300 / Scale.FACTOR) / 32);
     this.currentDirection = Direction.RIGHT;
     this.playerAttacking = false;
     this.flipX = true;
@@ -27,9 +25,9 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.scene.physics.world.enable(this);
     this.body.setCollideWorldBounds(true);
     // true isn't working for some reason.
-    // i should be able to avoid offset and just use this.body.setSize(40, 55, true);
-    this.body.setSize(40, 55);
-    this.body.setOffset((64 - 40) / 2, (64 - 55) / 2);
+    // // i should be able to avoid offset and just use this.body.setSize(40, 55, true);
+    this.body.setSize((Scale.FACTOR * 32 * 0.66), (Scale.FACTOR * 32 * 0.66));
+    this.body.setOffset((((32 * Scale.FACTOR) - (Scale.FACTOR * 32 * 0.66)) / 2), (((32 * Scale.FACTOR) - (Scale.FACTOR * 32 * 0.66)) / 2));
     this.body.setAllowGravity(false);
     this.scene.add.existing(this);
 
@@ -89,7 +87,8 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
 
   respawn(playerObject) {
     this.health = playerObject.health;
-    this.setPosition(playerObject.x * Scale.FACTOR, playerObject.y * Scale.FACTOR);
+    // this.setPosition(playerObject.x * Scale.FACTOR, playerObject.y * Scale.FACTOR);
+    this.setPosition(playerObject.x, playerObject.y);
     this.updateHealthBar();
     this.updateUsernameTextPosition();
   }
@@ -126,7 +125,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
         this.attack();
       }
     }
-
+    // TODO redo weapon placements
     if (this.currentDirection === Direction.UP) {
       this.weapon.setPosition(-30, -13);
     } else if (this.currentDirection === Direction.DOWN) {
