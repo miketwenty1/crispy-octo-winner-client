@@ -89,8 +89,6 @@ export default class GameScene extends Phaser.Scene {
             // the 1st argument is for what is moving
             // 2nd argument must contain an x.y coordinate (monsters[monsterId]) has x,y properties
             // 3rd arg is velocity
-            console.log(monsters[monsterId].x, monsters[monsterId].y);
-            console.log(monster.mVelocity);
             this.physics.moveToObject(monster, monsters[monsterId], monster.mVelocity);
           }
         });
