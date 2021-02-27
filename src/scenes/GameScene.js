@@ -81,19 +81,17 @@ export default class GameScene extends Phaser.Scene {
       });
     });
     this.socket.on('monsterMovement', (monsters) => {
-      console.log(monsters);
+      // console.log(monsters);
       this.monsters.getChildren().forEach((monster) => {
         Object.keys(monsters).forEach((monsterId) => {
-          // console.log(monsterId);
           if (monster.id === monsterId) {
             // better than setPosition() because it will use physics and is smoother
             // the 1st argument is for what is moving
-            // 2nd argument must contain an x.y coordinate
+            // 2nd argument must contain an x.y coordinate (monsters[monsterId]) has x,y properties
             // 3rd arg is velocity
-            console.log('monsters mVelocity');
-            console.log(monster);
+            console.log(monsters[monsterId].x, monsters[monsterId].y);
             console.log(monster.mVelocity);
-            this.physics.moveToObject(monster, monsters[monsterId], monster.velocity);
+            this.physics.moveToObject(monster, monsters[monsterId], monster.mVelocity);
           }
         });
       });
@@ -189,6 +187,7 @@ export default class GameScene extends Phaser.Scene {
           || y !== this.player.oldPosition.y
           || flipX !== this.player.oldPosition.flipX
           || playerAttacking !== this.player.oldPosition.playerAttacking)) {
+        console.log(x, y);
         this.socket.emit('playerMovement', {
           x, y, flipX, playerAttacking, currentDirection,
         });

@@ -76,7 +76,6 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.healthBar.fillStyle(0xffffff, 0.3);
     this.healthBar.fillRect(this.x - 32, this.y - 40, 32 * Scale.FACTOR, 5);
     this.healthBar.fillGradientStyle(0xff0000, 0xff00ff, 4);
-    // console.log(`health: ${this.health} max health: ${this.maxHealth}`);
     this.healthBar.fillRect(this.x - 32, this.y - 40, 32 * Scale.FACTOR * (this.health / this.maxHealth), 5);
   }
 
@@ -98,7 +97,6 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
       // cursor
       this.body.setVelocity(0);
       if (cursors.up.isDown || cursors.w.isDown) {
-        // console.log(cursors);
         this.body.setVelocityY(-this.velocity);
         this.currentDirection = Direction.UP;
       } else if (cursors.down.isDown || cursors.s.isDown) {

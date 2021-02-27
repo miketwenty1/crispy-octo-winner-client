@@ -19,7 +19,6 @@ export default class GameMap {
     this.tiles = this.tileMap.addTilesetImage(this.tileSetName, this.tileSetName, 32, 32, 1, 2);
     // create bg
     // name of layer in tile file, tiles, x-starting position, y-starting position
-    console.log(this.bgLayerName);
     this.backgroundLayer = this.tileMap.createLayer(this.bgLayerName, this.tiles, 0, 0);
     this.backgroundLayer.setScale(Scale.FACTOR);
     // create blocklayer

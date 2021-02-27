@@ -33,7 +33,6 @@ const config = {
 
 class Game extends Phaser.Game {
   constructor() {
-    console.log(`this is the server url ${SERVER_URL}`); // process.env.SERVER_URL
     super(config);
     const socket = io(SERVER_URL); // process.env.SERVER_URL
     this.globals = { socket };
