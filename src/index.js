@@ -17,6 +17,10 @@ const config = {
       gravity: {
         y: 0,
       },
+      matter: {
+        debug: true,
+        gravity: { x: 0, y: 0 },
+      },
     },
   },
   scale: {

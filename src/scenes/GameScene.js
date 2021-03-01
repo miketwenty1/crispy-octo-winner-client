@@ -81,23 +81,68 @@ export default class GameScene extends Phaser.Scene {
       });
     });
     this.socket.on('monsterMovement', (monsters) => {
-      // console.log(monsters);
-      this.monsters.getChildren().forEach((monster) => {
-        Object.keys(monsters).forEach((monsterId) => {
-          if (monster.id === monsterId) {
-            // better than setPosition() because it will use physics and is smoother
-            // the 1st argument is for what is moving
-            // 2nd argument must contain an x.y coordinate (monsters[monsterId]) has x,y properties
-            // 3rd arg is velocity
-            this.physics.moveToObject(monster, monsters[monsterId], monster.mVelocity);
-          }
-        });
-      });
-      // THIS IS EXCESSIVE not sure how else to make monsters stay in the world
-      this.monsters.getChildren().forEach((monster) => {
-        monster.body.collideWorldBounds = true;
-      });
+      this.targetMonsters = monsters;
+      // console.log(`movement when resetting is ${this.resettingLocation}`);
+      // if (this.resettingLocation === true) {
+      //   console.log('waiting for monster location reset to be done');
+      // } else {
+      //   this.monsterCollider.active = true;
+      //   // console.log(monsters);
+      //   this.monsters.getChildren().forEach((monster) => {
+      //     const sourceX = monster.x;
+      //     const sourceY = monster.y;
+      //     Object.keys(monsters).forEach((monsterId) => {
+      //       if (monster.id === monsterId) {
+      //         // better than setPosition() because it will use physics and is smoother
+      //         // the 1st argument is for what is moving
+      //         // 2nd argument must contain an x.y coordinate (monsters[monsterId]) has x,y properties
+      //         // 3rd arg is velocity
+      //         const distance = Phaser.Math.Distance.Between(sourceX, sourceY, monsters[monsterId].x, monsters[monsterId].y);
+      //         this.physics.moveToObject(monster, monsters[monsterId], monster.mVelocity, monsters[monsterId].movementIntervalTime);
+      //         // this.monsters[monsterId] = monster.setPosition(monsters[monsterId].x, monsters[monsterId].y);
+      //         if (distance < 10) {
+      //           console.log('this just happened - movement');
+      //           monster.body.reset(monster.x, monster.y);
+      //         }
+      //       }
+      //     });
+      //   });
+      //   // THIS IS EXCESSIVE
+      //   this.monsters.getChildren().forEach((monster) => {
+      //     monster.body.collideWorldBounds = true;
+      //   });
+      // }
     });
+    // this.socket.on('resetLocationMovement', (monsters) => {
+    //   this.resettingLocation = true;
+    //   // console.log(monsters);
+    //   this.monsterCollider.active = false;
+    //   this.monsters.getChildren().forEach((monster) => {
+    //     const sourceX = monster.x;
+    //     const sourceY = monster.y;
+    //     Object.keys(monsters).forEach((monsterId) => {
+    //       if (monster.id === monsterId) {
+    //         // better than setPosition() because it will use physics and is smoother
+    //         // the 1st argument is for what is moving
+    //         // 2nd argument must contain an x.y coordinate (monsters[monsterId]) has x,y properties
+    //         // 3rd arg is velocity
+    //         const distance = Phaser.Math.Distance.Between(sourceX, sourceY, monsters[monsterId].x, monsters[monsterId].y);
+    //         this.physics.moveToObject(monster, monsters[monsterId], monster.mVelocity, monsters[monsterId].movementIntervalTime / 3);
+    //         // console.log(sourceX, sourceY, monsters[monsterId].x, monsters[monsterId].y);
+    //         // monster.setPosition(monsters[monsterId].x, monsters[monsterId].y);
+    //         if (distance < 10) {
+    //           console.log('this just happened - synced');
+    //           monster.body.reset(monster.x, monster.y);
+    //         }
+    //       }
+    //     });
+    //   });
+    //   // THIS IS EXCESSIVE
+    //   // this.monsters.getChildren().forEach((monster) => {
+    //   //   // monster.body.collideWorldBounds = true;
+    //   // });
+    //   this.resettingLocation = false;
+    // });
     this.socket.on('chestRemoved', (chestId) => {
       this.chests.getChildren().forEach((chest) => {
         if (chest.id === chestId) {
@@ -171,6 +216,40 @@ export default class GameScene extends Phaser.Scene {
     // this.resize({ width: this.scale.width, height: this.scale.height });
   }
 
+  updateMonsterLocations() {
+    if (this.targetMonsters) {
+      this.monsters.getChildren().forEach((monster) => {
+        const sourceX = monster.x;
+        const sourceY = monster.y;
+        Object.keys(this.targetMonsters).forEach((monsterId) => {
+          if (monster.id === monsterId) {
+            // better than setPosition() because it will use physics and is smoother
+            // the 1st argument is for what is moving
+            // 2nd argument must contain an x.y coordinate (monsters[monsterId]) has x,y properties
+            // 3rd arg is velocity
+            const distance = Phaser.Math.Distance.Between(sourceX, sourceY, this.targetMonsters[monsterId].x, this.targetMonsters[monsterId].y);
+            // uses acceleration slow down speed up depending on how far away
+            this.physics.moveToObject(monster, this.targetMonsters[monsterId], monster.mVelocity, this.targetMonsters[monsterId].movementIntervalTime);
+            // good for constant speed coupled with reset logic can make cool charge like attacks
+            // this.physics.moveToObject(monster, this.targetMonsters[monsterId], 100);
+            // this.monsters[monsterId] = monster.setPosition(monsters[monsterId].x, monsters[monsterId].y);
+            if (distance < 10) {
+              // console.log('hopefully this happens a lot');
+              // this.monsterCollider.active = true;
+              monster.body.reset(this.targetMonsters[monsterId].x, this.targetMonsters[monsterId].y);
+            }
+            // else if (distance >= 100 && distance < 500 && this.monsterCollider.active === true) {
+            //   this.monsterCollider.active = false;
+            // } else if (distance >= 1000) {
+            //   // monster.body.reset(this.targetMonsters[monsterId].x, this.targetMonsters[monsterId].y);
+            //   // monster.setPosition(this.targetMonsters[monsterId].x, this.targetMonsters[monsterId].y);
+            // }
+          }
+        });
+      });
+    }
+  }
+
   update() {
     if (this.player) {
       this.player.update(this.cursors);
@@ -185,7 +264,6 @@ export default class GameScene extends Phaser.Scene {
           || y !== this.player.oldPosition.y
           || flipX !== this.player.oldPosition.flipX
           || playerAttacking !== this.player.oldPosition.playerAttacking)) {
-        console.log(x, y);
         this.socket.emit('playerMovement', {
           x, y, flipX, playerAttacking, currentDirection,
         });
@@ -198,6 +276,8 @@ export default class GameScene extends Phaser.Scene {
         playerAttacking: this.player.playerAttacking,
       };
     }
+    // freeze monster if in right location
+    this.updateMonsterLocations();
   }
 
   createAudio() {
@@ -322,8 +402,10 @@ export default class GameScene extends Phaser.Scene {
     // block the player and everything in the blocked layer
     this.physics.add.collider(this.player, this.gameMap.blockedLayer);
     this.physics.add.overlap(this.player, this.chests, this.collectChest, null, this);
-    this.physics.add.collider(this.monsters, this.gameMap.blockedLayer);
-    // this seems to be necessary because monsters still escaping
+    this.physics.add.overlap(this.player, this.monsters, this.monsterOverlap, null, this);
+    this.monsterCollider = this.physics.add.collider(this.monsters, this.gameMap.blockedLayer);
+    // for now we leave this false until monsters synced on backend with collision logic.
+    this.monsterCollider.active = false;
     this.physics.add.overlap(this.player.weapon, this.monsters, this.enemyOverlap, null, this);
     // add collisions for players to each other
     this.physics.add.collider(this.otherPlayers, this.player, this.pvpCollider, false, this);
@@ -347,7 +429,7 @@ export default class GameScene extends Phaser.Scene {
     if (this.player.playerAttacking && !this.player.swordHit) {
       this.player.swordHit = true;
       // enemy.makeInactive();
-      this.socket.emit('monsterAtttacked', enemy.id);
+      this.socket.emit('monsterAttacked', enemy.id);
     }
   }
 
@@ -361,11 +443,20 @@ export default class GameScene extends Phaser.Scene {
     this.socket.emit('pickUpChest', chest.id);
   }
 
-  createMap() {
-    // create map
-    this.gameMap = new GameMap(this, 'map', 'background', 'background', 'blocked');
+  monsterOverlap(player, monster) {
+    // chest.makeInactive();  this now done by chest event listener on chestRemoved
+    // this.score += chest.coins commenting this out because now it exist in the player model
+    // this.events.emit('updateBalance', this.score);  this also taken out and put game manager
+    if (this.playerDamageAudio.isPlaying === false) {
+      this.playerDamageAudio.play();
+    }
+    this.socket.emit('monsterOverlap', monster.id);
   }
 
+  createMap() {
+    // create map
+    this.gameMap = new GameMap(this, 'map', 'background', 'background', 'blocked', 'special_locations');
+  }
   // resize(gameSize) {
   //   const { width, height } = gameSize;
   //   this.cameras.resize(width, height);

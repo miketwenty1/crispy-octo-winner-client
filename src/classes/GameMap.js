@@ -2,12 +2,13 @@ import { Scale } from '../utils/utils';
 
 export default class GameMap {
   // this, 'map', 'backgound', 'backgound', 'blocked');
-  constructor(scene, key, tileSetName, bgLayerName, blockedLayerName) {
+  constructor(scene, key, tileSetName, bgLayerName, blockedLayerName, specialLayerName) {
     this.scene = scene;
     this.key = key;
     this.tileSetName = tileSetName;
     this.bgLayerName = bgLayerName;
     this.blockedLayerName = blockedLayerName;
+    this.specialLayerName = specialLayerName;
     this.createMap();
   }
 
@@ -26,6 +27,11 @@ export default class GameMap {
     this.blockedLayer.setScale(Scale.FACTOR);
     // -1 (default all in the layer)
     this.blockedLayer.setCollisionByExclusion([-1]);
+
+    this.specialLayer = this.tileMap.createLayer(this.specialLayerName, this.tiles, 0, 0);
+    // this.specialLayerName.setScale(Scale.FACTOR);
+    // // -1 (default all in the layer)
+    // this.specialLayerName.setCollisionByExclusion([-1]);
 
     // update the world bounds
     this.scene.physics.world.bounds.width = this.tileMap.widthInPixels * Scale.FACTOR;

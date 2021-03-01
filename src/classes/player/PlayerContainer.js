@@ -123,15 +123,15 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
         this.attack();
       }
     }
-    // TODO redo weapon placements
+
     if (this.currentDirection === Direction.UP) {
-      this.weapon.setPosition(-30, -13);
+      this.weapon.setPosition(0, -(Scale.FACTOR * 32) / 3);
     } else if (this.currentDirection === Direction.DOWN) {
-      this.weapon.setPosition(20, 20);
+      this.weapon.setPosition(0, (Scale.FACTOR * 32) / 3);
     } else if (this.currentDirection === Direction.LEFT) {
-      this.weapon.setPosition(-32, -10);
+      this.weapon.setPosition(-(Scale.FACTOR * 32) / 3, 0);
     } else if (this.currentDirection === Direction.RIGHT) {
-      this.weapon.setPosition(32, -10);
+      this.weapon.setPosition((Scale.FACTOR * 32) / 3, 0);
     }
 
     if (this.playerAttacking) {
