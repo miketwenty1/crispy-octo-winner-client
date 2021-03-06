@@ -1,9 +1,10 @@
 import * as Phaser from 'phaser';
 import PlayerContainer from '../classes/player/PlayerContainer';
 import Chest from '../classes/Chest';
+import HealingFountain from '../classes/HealingFountain';
 import Monster from '../classes/Monster';
 import GameMap from '../classes/GameMap';
-import { getCookie, AUDIO_LEVEL } from '../utils/utils';
+import { getCookie, AUDIO_LEVEL, Scale } from '../utils/utils';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -87,7 +88,6 @@ export default class GameScene extends Phaser.Scene {
       //   console.log('waiting for monster location reset to be done');
       // } else {
       //   this.monsterCollider.active = true;
-      //   // console.log(monsters);
       //   this.monsters.getChildren().forEach((monster) => {
       //     const sourceX = monster.x;
       //     const sourceY = monster.y;
@@ -101,7 +101,6 @@ export default class GameScene extends Phaser.Scene {
       //         this.physics.moveToObject(monster, monsters[monsterId], monster.mVelocity, monsters[monsterId].movementIntervalTime);
       //         // this.monsters[monsterId] = monster.setPosition(monsters[monsterId].x, monsters[monsterId].y);
       //         if (distance < 10) {
-      //           console.log('this just happened - movement');
       //           monster.body.reset(monster.x, monster.y);
       //         }
       //       }
@@ -115,7 +114,6 @@ export default class GameScene extends Phaser.Scene {
     });
     // this.socket.on('resetLocationMovement', (monsters) => {
     //   this.resettingLocation = true;
-    //   // console.log(monsters);
     //   this.monsterCollider.active = false;
     //   this.monsters.getChildren().forEach((monster) => {
     //     const sourceX = monster.x;
@@ -128,10 +126,8 @@ export default class GameScene extends Phaser.Scene {
     //         // 3rd arg is velocity
     //         const distance = Phaser.Math.Distance.Between(sourceX, sourceY, monsters[monsterId].x, monsters[monsterId].y);
     //         this.physics.moveToObject(monster, monsters[monsterId], monster.mVelocity, monsters[monsterId].movementIntervalTime / 3);
-    //         // console.log(sourceX, sourceY, monsters[monsterId].x, monsters[monsterId].y);
     //         // monster.setPosition(monsters[monsterId].x, monsters[monsterId].y);
     //         if (distance < 10) {
-    //           console.log('this just happened - synced');
     //           monster.body.reset(monster.x, monster.y);
     //         }
     //       }
@@ -164,7 +160,9 @@ export default class GameScene extends Phaser.Scene {
     this.socket.on('updatePlayerHealth', (playerId, health) => {
       if (this.player.id === playerId) {
         if (health < this.player.health) {
-          this.playerDamageAudio.play();
+          if (this.playerDamageAudio.isPlaying === false) {
+            this.playerDamageAudio.play();
+          }
         }
         this.player.updateHealth(health);
       } else {
@@ -208,6 +206,7 @@ export default class GameScene extends Phaser.Scene {
     this.createAudio();
     this.createInput();
     this.createGroups();
+    this.createSpriteAnimations();
 
     // emit event that a new player joined
     this.socket.emit('newPlayer', getCookie('jwt'), this.selectedCharacter);
@@ -234,7 +233,6 @@ export default class GameScene extends Phaser.Scene {
             // this.physics.moveToObject(monster, this.targetMonsters[monsterId], 100);
             // this.monsters[monsterId] = monster.setPosition(monsters[monsterId].x, monsters[monsterId].y);
             if (distance < 10) {
-              // console.log('hopefully this happens a lot');
               // this.monsterCollider.active = true;
               monster.body.reset(this.targetMonsters[monsterId].x, this.targetMonsters[monsterId].y);
             }
@@ -306,8 +304,6 @@ export default class GameScene extends Phaser.Scene {
   createPlayer(playerObject, mainPlayer) {
     const playerGameObject = new PlayerContainer(
       this,
-      // playerObject.x * Scale.FACTOR,
-      // playerObject.y * Scale.FACTOR,
       playerObject.x,
       playerObject.y,
       'characters',
@@ -411,11 +407,19 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.otherPlayers, this.player, this.pvpCollider, false, this);
     // check for overlap of weapon
     this.physics.add.overlap(this.player.weapon, this.otherPlayers, this.weaponOverlapEnemy, false, this);
+    this.physics.add.collider(this.player, this.fountain.innerCollisionObj);
+    this.physics.add.overlap(this.player, this.fountain, this.healOverlap, false, this);
   }
 
   pvpCollider(player, otherPlayer) {
     this.player.body.setVelocity(0);
     otherPlayer.body.setVelocity(0);
+  }
+
+  healOverlap() {
+    if (this.player.health < this.player.maxHealth) {
+      this.socket.emit('healPlayer');
+    }
   }
 
   weaponOverlapEnemy(player, enemyPlayer) {
@@ -444,9 +448,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   monsterOverlap(player, monster) {
-    // chest.makeInactive();  this now done by chest event listener on chestRemoved
-    // this.score += chest.coins commenting this out because now it exist in the player model
-    // this.events.emit('updateBalance', this.score);  this also taken out and put game manager
     if (this.playerDamageAudio.isPlaying === false) {
       this.playerDamageAudio.play();
     }
@@ -461,4 +462,23 @@ export default class GameScene extends Phaser.Scene {
   //   const { width, height } = gameSize;
   //   this.cameras.resize(width, height);
   // }
+
+  createSpriteAnimations() {
+    // healing fountain
+
+    // THIS IS GOOD for things that dont need to objects or use physics
+    // this.fountainAnimation = this.anims.create({
+    //   key: 'sprinkle',
+    //   frames: this.anims.generateFrameNumbers('bg_spritesheet', { frames: [82, 83] }),
+    //   frameRate: 3,
+    // });
+    // const sprite = this.add.sprite(2000, 2000, 'bg_spritesheet').setScale(2);
+    // sprite.play({ key: 'sprinkle', repeat: -1 });
+    this.fountain = new HealingFountain(
+      this,
+      this.gameMap.specialLayer.objects[0].x * Scale.FACTOR,
+      this.gameMap.specialLayer.objects[0].y * Scale.FACTOR,
+      23423,
+    );
+  }
 }

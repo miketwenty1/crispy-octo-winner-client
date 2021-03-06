@@ -1,4 +1,5 @@
 import { Scale } from '../utils/utils';
+import HealingFountain from './HealingFountain';
 
 export default class GameMap {
   // this, 'map', 'backgound', 'backgound', 'blocked');
@@ -28,7 +29,20 @@ export default class GameMap {
     // -1 (default all in the layer)
     this.blockedLayer.setCollisionByExclusion([-1]);
 
-    this.specialLayer = this.tileMap.createLayer(this.specialLayerName, this.tiles, 0, 0);
+    this.specialLayer = this.tileMap.getObjectLayer(this.specialLayerName);
+    this.specialLayer.objects.forEach((obj) => {
+      if (obj.gid) {
+        this.specialObject = new HealingFountain(
+          this.scene,
+          obj.x * Scale.FACTOR,
+          obj.y * Scale.FACTOR,
+          'bg_spritesheet',
+          obj.gid - 1,
+          obj.id,
+        );
+      }
+    });
+
     // this.specialLayerName.setScale(Scale.FACTOR);
     // // -1 (default all in the layer)
     // this.specialLayerName.setCollisionByExclusion([-1]);
