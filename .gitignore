@@ -3,3 +3,4 @@ node_modules/
 .eslintrc.json
 .babelrc
 .vscode/
+build/
