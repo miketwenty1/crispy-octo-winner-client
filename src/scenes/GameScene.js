@@ -5,6 +5,7 @@ import HealingFountain from '../classes/HealingFountain';
 import Monster from '../classes/Monster';
 import GameMap from '../classes/GameMap';
 import { getCookie, AUDIO_LEVEL, Scale } from '../utils/utils';
+import DialogWindow from '../classes/DialogWindow';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -195,6 +196,10 @@ export default class GameScene extends Phaser.Scene {
       });
     });
 
+    this.socket.on('newMessage', (messageObj) => {
+      this.dialogWindow.addNewMessage(messageObj);
+    });
+
     this.socket.on('invalidToken', () => {
       window.alert('invalid token log in again por FaVoR');
       window.location.reload();
@@ -208,11 +213,71 @@ export default class GameScene extends Phaser.Scene {
     this.createGroups();
     this.createSpriteAnimations();
 
+    this.dialogWindow = new DialogWindow(this, {
+      x: this.scale.width,
+      // y: this.scale.height,
+    });
+
     // emit event that a new player joined
     this.socket.emit('newPlayer', getCookie('jwt'), this.selectedCharacter);
     // NOT SURE HOW this is working with this code being commented out
-    // this.scale.on('resize', this.resize, this);
-    // this.resize({ width: this.scale.width, height: this.scale.height });
+    this.scale.on('resize', this.resize, this);
+    this.resize({ width: this.scale.width, height: this.scale.height });
+
+    // add keydown event listener
+    this.keyDownEventListener();
+
+    // remove focus from chat input field
+    this.input.on('pointerdown', () => {
+      document.getElementById('chatInput').blur();
+    });
+  }
+
+  keyDownEventListener() {
+    this.inputMessageField = document.getElementById('chatInput');
+
+    window.addEventListener('keydown', (event) => {
+      // 13 is the enter key
+      if (event.which === 13) {
+        this.sendMessage();
+      // 32 is the spacebar
+      } else if (event.which === 32) {
+        if (document.activeElement === this.inputMessageField) {
+          this.inputMessageField.value = `${this.inputMessageField.value} `;
+        }
+      // 65 is the a key
+      } else if (event.which === 65) {
+        if (document.activeElement === this.inputMessageField) {
+          this.inputMessageField.value = `${this.inputMessageField.value}a`;
+        }
+      // 83 is the s key
+      } else if (event.which === 83) {
+        if (document.activeElement === this.inputMessageField) {
+          this.inputMessageField.value = `${this.inputMessageField.value}s`;
+        }
+      // 68 is the d key
+      } else if (event.which === 68) {
+        if (document.activeElement === this.inputMessageField) {
+          this.inputMessageField.value = `${this.inputMessageField.value}d`;
+        }
+      // 87 is the w key
+      } else if (event.which === 87) {
+        if (document.activeElement === this.inputMessageField) {
+          this.inputMessageField.value = `${this.inputMessageField.value}w`;
+        }
+      }
+    });
+  }
+
+  sendMessage() {
+    console.log('send message');
+    if (this.inputMessageField) {
+      const message = this.inputMessageField.value;
+      if (message) {
+        this.inputMessageField.value = '';
+        this.socket.emit('sendMessage', message, getCookie('jwt'));
+      }
+    }
   }
 
   updateMonsterLocations() {
@@ -249,6 +314,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update() {
+    this.dialogWindow.update();
     if (this.player) {
       this.player.update(this.cursors);
     }
@@ -458,10 +524,12 @@ export default class GameScene extends Phaser.Scene {
     // create map
     this.gameMap = new GameMap(this, 'map', 'background', 'background', 'blocked', 'special_locations');
   }
-  // resize(gameSize) {
-  //   const { width, height } = gameSize;
-  //   this.cameras.resize(width, height);
-  // }
+
+  resize(gameSize) {
+    const { width, height } = gameSize;
+    this.cameras.resize(width, height);
+    this.dialogWindow.resize(gameSize);
+  }
 
   createSpriteAnimations() {
     // healing fountain

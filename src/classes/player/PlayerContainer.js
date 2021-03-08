@@ -94,6 +94,8 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.updateUsernameTextPosition();
   }
 
+  // for angular velocity
+  // x = r(cos(degrees‎°)), y = r(sin(degrees‎°))
   update(cursors) {
     if (this.mainPlayer) {
       // cursor

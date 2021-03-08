@@ -1,4 +1,4 @@
-import { postData } from '../utils/utils';
+import { postData, refreshTokenInterval } from '../utils/utils';
 import CredentialsBaseScene from './CredentialsBaseScene';
 
 export default class LoginScene extends CredentialsBaseScene {
@@ -24,6 +24,7 @@ export default class LoginScene extends CredentialsBaseScene {
       postData(`${SERVER_URL}/login`, { email: emailValue, password: passwordValue })
         .then((res) => {
           if (res.status === 200) {
+            refreshTokenInterval();
             this.startScene('CharacterSelection');
           } else {
             console.log(res);
