@@ -197,6 +197,7 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.socket.on('newMessage', (messageObj) => {
+      // console.log(messageObj);
       this.dialogWindow.addNewMessage(messageObj);
     });
 
@@ -215,7 +216,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.dialogWindow = new DialogWindow(this, {
       x: this.scale.width,
-      // y: this.scale.height,
+      y: this.scale.height,
     });
 
     // emit event that a new player joined
@@ -270,11 +271,12 @@ export default class GameScene extends Phaser.Scene {
   }
 
   sendMessage() {
-    console.log('send message');
+    // console.log('send message');
     if (this.inputMessageField) {
       const message = this.inputMessageField.value;
       if (message) {
         this.inputMessageField.value = '';
+        console.log(message);
         this.socket.emit('sendMessage', message, getCookie('jwt'));
       }
     }

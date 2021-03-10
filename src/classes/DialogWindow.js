@@ -16,9 +16,9 @@ export default class DialogWindow {
 
     this.borderThickness = 3;
     this.borderColor = 0x907748;
-    this.borderAlpha = 0.3;
-    this.windowAlpha = 0.4;
-    this.textAlpha = 0.2;
+    this.borderAlpha = 0;
+    this.windowAlpha = 0;
+    this.textAlpha = 0.75;
     this.windowColor = 0x303030;
     this.windowWidth = 305;
     this.windowHeight = this.scene.scale.height;
@@ -33,12 +33,18 @@ export default class DialogWindow {
     this.createInput();
     this.createWindow();
     this.makeInteractive();
+    // setInterval(() => {
+    //   this.addNewMessage({
+    //     username: 'New Bitcoin Block Found',
+    //     message: `0000000000000${Date.now()}`,
+    //   });
+    // }, 60000);
     setInterval(() => {
       this.addNewMessage({
-        username: 'New Bitcoin Block Found',
-        message: `0000000000000${Date.now()}`,
+        username: '',
+        message: '',
       });
-    }, 60000);
+    }, 5000);
   }
 
   createWindow() {
@@ -67,6 +73,8 @@ export default class DialogWindow {
   createInnerWindow({
     x, y, rectWidth, rectHeight,
   }) {
+    // this.input.classList.add('chat-visible');
+    // this.input.classList.remove('chat-invisible');
     this.graphics.fillStyle(this.windowColor, this.windowAlpha);
     this.graphics.fillRect(x + 1, y + 1, rectWidth - 1, rectHeight - 1);
 
@@ -107,8 +115,8 @@ export default class DialogWindow {
       this.input.classList.add('chat-visible');
       this.input.classList.remove('chat-invisible');
 
-      this.windowAlpha = 1;
-      this.borderAlpha = 1;
+      this.windowAlpha = 0.5;
+      this.borderAlpha = 0.6;
       this.textAlpha = 1;
       this.redrawWindow();
     });
@@ -117,9 +125,9 @@ export default class DialogWindow {
       this.input.classList.remove('chat-visible');
       this.input.classList.add('chat-invisible');
 
-      this.windowAlpha = 0.4;
-      this.borderAlpha = 0.3;
-      this.textAlpha = 0.2;
+      this.windowAlpha = 0;
+      this.borderAlpha = 0;
+      this.textAlpha = 0.75;
       this.redrawWindow();
     });
   }
@@ -128,7 +136,12 @@ export default class DialogWindow {
     this.messages.push(messageObject);
 
     const windowDimensions = this.calculateWindowDimension();
-    const message = `${messageObject.username}: ${messageObject.message}`;
+    let message = '';
+    if (!messageObject.username) {
+      message = '';
+    } else {
+      message = `${messageObject.username} ${messageObject.message}`;
+    }
 
     let messageText = this.messageGroup.getFirstDead();
     if (!messageText) {
@@ -151,7 +164,7 @@ export default class DialogWindow {
     this.messagesHeight += messageText.height;
 
     // stop the message list from going off screen
-    if (this.messagesHeight > (windowDimensions.rectHeight - 60)) {
+    if (this.messagesHeight > (windowDimensions.rectHeight - windowDimensions.rectHeight * 0.1)) {
       // reset messages height
       this.messagesHeight = 0;
       // remove the first dialog item from our array
@@ -162,7 +175,11 @@ export default class DialogWindow {
           child.setActive(false);
           child.setVisible(false);
         } else {
-          child.setText(`${this.messages[index].name}: ${this.messages[index].message}`);
+          if (!this.messages[index].username) {
+            child.setText('');
+          } else {
+            child.setText(`${this.messages[index].username}: ${this.messages[index].message}`);
+          }
           child.setY(this.messagesHeight);
           child.setActive(true);
           child.setVisible(true);
