@@ -318,7 +318,7 @@ export default class GameScene extends Phaser.Scene {
   update() {
     this.dialogWindow.update();
     if (this.player) {
-      this.player.update(this.cursors);
+      this.player.update(this.cursors, this.input.activePointer, this.scale.width / 2, this.scale.height / 2);
     }
     // if no change then don't emit event only emit on change so server doesn't get flooded with b.s.
     if (this.player) {

@@ -9,6 +9,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.scene = scene;
     // 32 for the pixels of the base sprites, 2.7 to get the scale with 2 to be about 360
     this.velocity = Scale.FACTOR * 32 * ((300 / Scale.FACTOR) / 32);
+    this.diagonalVelocity = this.velocity * 0.707;
     this.currentDirection = Direction.RIGHT;
     this.playerAttacking = false;
     this.flipX = true;
@@ -96,26 +97,47 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
 
   // for angular velocity
   // x = r(cos(degrees‎°)), y = r(sin(degrees‎°))
-  update(cursors) {
+  update(cursors, pointer, playerX, playerY) {
+    let updatedVelocity = this.velocity;
+    // this is to help give up down left and right options to the character
+    const toleranceOfDirectionY = playerY * 0.25;
+    const toleranceOfDirectionX = playerX * 0.25;
+    // calculate velocity based on multi direction
+    // check for diagonal up
+    if ((cursors.up.isDown || cursors.w.isDown || (pointer.isDown === true && pointer.y + toleranceOfDirectionY < playerY))
+    && (
+      (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX))
+      || (cursors.right.isDown || cursors.d.isDown || (pointer.isDown === true && pointer.x - toleranceOfDirectionX > playerX))
+    )) {
+      updatedVelocity = this.diagonalVelocity;
+    }
+    // check for diagonal down
+    if ((cursors.down.isDown || cursors.s.isDown || (pointer.isDown === true && pointer.y - toleranceOfDirectionY > playerY))
+    && (
+      (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX))
+      || (cursors.right.isDown || cursors.d.isDown || (pointer.isDown === true && pointer.x - toleranceOfDirectionX > playerX))
+    )) {
+      updatedVelocity = this.diagonalVelocity;
+    }
     if (this.mainPlayer) {
       // cursor
       this.body.setVelocity(0);
-      if (cursors.up.isDown || cursors.w.isDown) {
-        this.body.setVelocityY(-this.velocity);
+      if (cursors.up.isDown || cursors.w.isDown || (pointer.isDown === true && pointer.y + toleranceOfDirectionY < playerY)) {
+        this.body.setVelocityY(-updatedVelocity);
         this.currentDirection = Direction.UP;
-      } else if (cursors.down.isDown || cursors.s.isDown) {
-        this.body.setVelocityY(this.velocity);
+      } else if (cursors.down.isDown || cursors.s.isDown || (pointer.isDown === true && pointer.y - toleranceOfDirectionY > playerY)) {
+        this.body.setVelocityY(updatedVelocity);
         this.currentDirection = Direction.DOWN;
       // eslint-disable-next-line no-empty
       } else {
       }
-      if (cursors.left.isDown || cursors.a.isDown) {
-        this.body.setVelocityX(-this.velocity);
+      if (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX)) {
+        this.body.setVelocityX(-updatedVelocity);
         this.currentDirection = Direction.LEFT;
         this.player.flipX = false;
         this.flipX = false;
-      } else if (cursors.right.isDown || cursors.d.isDown) {
-        this.body.setVelocityX(this.velocity);
+      } else if (cursors.right.isDown || cursors.d.isDown || (pointer.isDown === true && pointer.x - toleranceOfDirectionX > playerX)) {
+        this.body.setVelocityX(updatedVelocity);
         this.currentDirection = Direction.RIGHT;
         this.player.flipX = true;
         this.flipX = true;

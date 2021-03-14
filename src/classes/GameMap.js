@@ -51,6 +51,7 @@ export default class GameMap {
     this.scene.physics.world.bounds.width = this.tileMap.widthInPixels * Scale.FACTOR;
     this.scene.physics.world.bounds.height = this.tileMap.heightInPixels * Scale.FACTOR;
     // limit camera
-    this.scene.cameras.main.setBounds(0, 0, this.tileMap.widthInPixels * Scale.FACTOR, this.tileMap.heightInPixels * Scale.FACTOR);
+    // with this commented out we can see black space.. this is done to help with player movement on mobile with pointer down.
+    // this.scene.cameras.main.setBounds(0, 0, this.tileMap.widthInPixels * Scale.FACTOR, this.tileMap.heightInPixels * Scale.FACTOR);
   }
 }
