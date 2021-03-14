@@ -104,7 +104,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     const toleranceOfDirectionX = playerX * 0.25;
     // calculate velocity based on multi direction
     // check for diagonal up
-    if (cursors && pointer) {
+    if (cursors.up && pointer) {
       if ((cursors.up.isDown || cursors.w.isDown || (pointer.isDown === true && pointer.y + toleranceOfDirectionY < playerY))
       && (
         (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX))
