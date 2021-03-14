@@ -104,21 +104,24 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     const toleranceOfDirectionX = playerX * 0.25;
     // calculate velocity based on multi direction
     // check for diagonal up
-    if ((cursors.up.isDown || cursors.w.isDown || (pointer.isDown === true && pointer.y + toleranceOfDirectionY < playerY))
-    && (
-      (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX))
-      || (cursors.right.isDown || cursors.d.isDown || (pointer.isDown === true && pointer.x - toleranceOfDirectionX > playerX))
-    )) {
-      updatedVelocity = this.diagonalVelocity;
+    if (cursors && pointer) {
+      if ((cursors.up.isDown || cursors.w.isDown || (pointer.isDown === true && pointer.y + toleranceOfDirectionY < playerY))
+      && (
+        (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX))
+        || (cursors.right.isDown || cursors.d.isDown || (pointer.isDown === true && pointer.x - toleranceOfDirectionX > playerX))
+      )) {
+        updatedVelocity = this.diagonalVelocity;
+      }
+      // check for diagonal down
+      if ((cursors.down.isDown || cursors.s.isDown || (pointer.isDown === true && pointer.y - toleranceOfDirectionY > playerY))
+      && (
+        (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX))
+        || (cursors.right.isDown || cursors.d.isDown || (pointer.isDown === true && pointer.x - toleranceOfDirectionX > playerX))
+      )) {
+        updatedVelocity = this.diagonalVelocity;
+      }
     }
-    // check for diagonal down
-    if ((cursors.down.isDown || cursors.s.isDown || (pointer.isDown === true && pointer.y - toleranceOfDirectionY > playerY))
-    && (
-      (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX))
-      || (cursors.right.isDown || cursors.d.isDown || (pointer.isDown === true && pointer.x - toleranceOfDirectionX > playerX))
-    )) {
-      updatedVelocity = this.diagonalVelocity;
-    }
+
     if (this.mainPlayer) {
       // cursor
       this.body.setVelocity(0);
