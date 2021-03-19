@@ -4,7 +4,7 @@ import Direction from '../../utils/direction';
 import { Scale } from '../../utils/utils';
 
 export default class PlayerContainer extends Phaser.GameObjects.Container {
-  constructor(scene, x, y, key, frame, health, maxHealth, id, attackAudio, mainPlayer, username) {
+  constructor(scene, x, y, key, frame, attack, health, maxHealth, defense, id, attackAudio, mainPlayer, username) {
     super(scene, x, y);
     this.scene = scene;
     // 32 for the pixels of the base sprites, 2.7 to get the scale with 2 to be about 360
@@ -13,8 +13,10 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.playerAttacking = false;
     this.flipX = true;
     this.swordHit = false;
+    this.attack = attack;
     this.health = health;
     this.maxHealth = maxHealth;
+    this.defense = defense;
     this.id = id;
     this.attackAudio = attackAudio;
     this.mainPlayer = mainPlayer;
@@ -44,6 +46,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
 
     // weapon
     this.weapon = this.scene.add.image(32, -10, 'items', 4);
+    // this.weapon = this.scene.add.image(32, -10, 'tools', 0);
     this.scene.add.existing(this.weapon);
     this.weapon.setScale(Scale.FACTOR * 0.75);
     this.scene.physics.world.enable(this.weapon);
@@ -104,7 +107,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
       this.movePlayer(cursors, pointer, gameScene);
 
       if (Phaser.Input.Keyboard.JustDown(cursors.space) && !this.playerAttacking) {
-        this.attack();
+        this.attackAction();
       }
     }
 
@@ -158,7 +161,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     }
   }
 
-  attack() {
+  attackAction() {
     if (this.mainPlayer) {
       this.attackAudio.play();
     }

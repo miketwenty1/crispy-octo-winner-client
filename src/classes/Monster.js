@@ -8,6 +8,7 @@ export default class Monster extends Phaser.Physics.Arcade.Image {
     this.scene = scene;
     this.id = id;
     this.health = health;
+    // this.attack = attack;
     this.maxHealth = maxHealth;
     this.mVelocity = mVelocity;
 

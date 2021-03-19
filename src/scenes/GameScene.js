@@ -84,62 +84,8 @@ export default class GameScene extends Phaser.Scene {
     });
     this.socket.on('monsterMovement', (monsters) => {
       this.targetMonsters = monsters;
-      // console.log(`movement when resetting is ${this.resettingLocation}`);
-      // if (this.resettingLocation === true) {
-      //   console.log('waiting for monster location reset to be done');
-      // } else {
-      //   this.monsterCollider.active = true;
-      //   this.monsters.getChildren().forEach((monster) => {
-      //     const sourceX = monster.x;
-      //     const sourceY = monster.y;
-      //     Object.keys(monsters).forEach((monsterId) => {
-      //       if (monster.id === monsterId) {
-      //         // better than setPosition() because it will use physics and is smoother
-      //         // the 1st argument is for what is moving
-      //         // 2nd argument must contain an x.y coordinate (monsters[monsterId]) has x,y properties
-      //         // 3rd arg is velocity
-      //         const distance = Phaser.Math.Distance.Between(sourceX, sourceY, monsters[monsterId].x, monsters[monsterId].y);
-      //         this.physics.moveToObject(monster, monsters[monsterId], monster.mVelocity, monsters[monsterId].movementIntervalTime);
-      //         // this.monsters[monsterId] = monster.setPosition(monsters[monsterId].x, monsters[monsterId].y);
-      //         if (distance < 10) {
-      //           monster.body.reset(monster.x, monster.y);
-      //         }
-      //       }
-      //     });
-      //   });
-      //   // THIS IS EXCESSIVE
-      //   this.monsters.getChildren().forEach((monster) => {
-      //     monster.body.collideWorldBounds = true;
-      //   });
-      // }
     });
-    // this.socket.on('resetLocationMovement', (monsters) => {
-    //   this.resettingLocation = true;
-    //   this.monsterCollider.active = false;
-    //   this.monsters.getChildren().forEach((monster) => {
-    //     const sourceX = monster.x;
-    //     const sourceY = monster.y;
-    //     Object.keys(monsters).forEach((monsterId) => {
-    //       if (monster.id === monsterId) {
-    //         // better than setPosition() because it will use physics and is smoother
-    //         // the 1st argument is for what is moving
-    //         // 2nd argument must contain an x.y coordinate (monsters[monsterId]) has x,y properties
-    //         // 3rd arg is velocity
-    //         const distance = Phaser.Math.Distance.Between(sourceX, sourceY, monsters[monsterId].x, monsters[monsterId].y);
-    //         this.physics.moveToObject(monster, monsters[monsterId], monster.mVelocity, monsters[monsterId].movementIntervalTime / 3);
-    //         // monster.setPosition(monsters[monsterId].x, monsters[monsterId].y);
-    //         if (distance < 10) {
-    //           monster.body.reset(monster.x, monster.y);
-    //         }
-    //       }
-    //     });
-    //   });
-    //   // THIS IS EXCESSIVE
-    //   // this.monsters.getChildren().forEach((monster) => {
-    //   //   // monster.body.collideWorldBounds = true;
-    //   // });
-    //   this.resettingLocation = false;
-    // });
+
     this.socket.on('chestRemoved', (chestId) => {
       this.chests.getChildren().forEach((chest) => {
         if (chest.id === chestId) {
@@ -378,8 +324,10 @@ export default class GameScene extends Phaser.Scene {
       playerObject.y,
       'characters',
       playerObject.frame,
+      playerObject.attack,
       playerObject.health,
       playerObject.maxHealth,
+      playerObject.defense,
       playerObject.id,
       this.playerAttackAudio,
       mainPlayer, // true if main player
