@@ -231,6 +231,7 @@ export default class GameScene extends Phaser.Scene {
     // remove focus from chat input field
     this.input.on('pointerdown', () => {
       document.getElementById('chatInput').blur();
+      this.player.toggleMovement();
     });
   }
 
@@ -318,7 +319,7 @@ export default class GameScene extends Phaser.Scene {
   update() {
     this.dialogWindow.update();
     if (this.player) {
-      this.player.update(this.cursors, this.input.activePointer, this.scale.width / 2, this.scale.height / 2);
+      this.player.update(this.cursors, this.input.activePointer, this);
     }
     // if no change then don't emit event only emit on change so server doesn't get flooded with b.s.
     if (this.player) {

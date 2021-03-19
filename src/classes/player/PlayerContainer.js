@@ -9,7 +9,6 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.scene = scene;
     // 32 for the pixels of the base sprites, 2.7 to get the scale with 2 to be about 360
     this.velocity = Scale.FACTOR * 32 * ((300 / Scale.FACTOR) / 32);
-    this.diagonalVelocity = this.velocity * 0.707;
     this.currentDirection = Direction.RIGHT;
     this.playerAttacking = false;
     this.flipX = true;
@@ -21,6 +20,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.mainPlayer = mainPlayer;
     this.username = username;
     this.frame = frame;
+    this.movementEnabled = false;
 
     // this.setSize(32 * Scale.FACTOR, 32 * Scale.FACTOR);
     this.setSize((Scale.FACTOR * 32 * 0.66), (Scale.FACTOR * 32 * 0.66));
@@ -97,70 +97,15 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
 
   // for angular velocity
   // x = r(cos(degrees‎°)), y = r(sin(degrees‎°))
-  update(cursors, pointer, playerX, playerY) {
-    let updatedVelocity = this.velocity;
-    // this is to help give up down left and right options to the character
-    const toleranceOfDirectionY = playerY * 0.25;
-    const toleranceOfDirectionX = playerX * 0.25;
-    // calculate velocity based on multi direction
-    // check for diagonal up
-    if (cursors.up && pointer) {
-      if ((cursors.up.isDown || cursors.w.isDown || (pointer.isDown === true && pointer.y + toleranceOfDirectionY < playerY))
-      && (
-        (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX))
-        || (cursors.right.isDown || cursors.d.isDown || (pointer.isDown === true && pointer.x - toleranceOfDirectionX > playerX))
-      )) {
-        updatedVelocity = this.diagonalVelocity;
-      }
-      // check for diagonal down
-      if ((cursors.down.isDown || cursors.s.isDown || (pointer.isDown === true && pointer.y - toleranceOfDirectionY > playerY))
-      && (
-        (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX))
-        || (cursors.right.isDown || cursors.d.isDown || (pointer.isDown === true && pointer.x - toleranceOfDirectionX > playerX))
-      )) {
-        updatedVelocity = this.diagonalVelocity;
-      }
-    }
-
+  update(cursors, pointer, gameScene) {
     if (this.mainPlayer) {
       // cursor
       this.body.setVelocity(0);
-      if (cursors.up.isDown || cursors.w.isDown || (pointer.isDown === true && pointer.y + toleranceOfDirectionY < playerY)) {
-        this.body.setVelocityY(-updatedVelocity);
-        this.currentDirection = Direction.UP;
-      } else if (cursors.down.isDown || cursors.s.isDown || (pointer.isDown === true && pointer.y - toleranceOfDirectionY > playerY)) {
-        this.body.setVelocityY(updatedVelocity);
-        this.currentDirection = Direction.DOWN;
-      // eslint-disable-next-line no-empty
-      } else {
-      }
-      if (cursors.left.isDown || cursors.a.isDown || (pointer.isDown === true && pointer.x + toleranceOfDirectionX < playerX)) {
-        this.body.setVelocityX(-updatedVelocity);
-        this.currentDirection = Direction.LEFT;
-        this.player.flipX = false;
-        this.flipX = false;
-      } else if (cursors.right.isDown || cursors.d.isDown || (pointer.isDown === true && pointer.x - toleranceOfDirectionX > playerX)) {
-        this.body.setVelocityX(updatedVelocity);
-        this.currentDirection = Direction.RIGHT;
-        this.player.flipX = true;
-        this.flipX = true;
-      // eslint-disable-next-line no-empty
-      } else {
-      }
+      this.movePlayer(cursors, pointer, gameScene);
 
       if (Phaser.Input.Keyboard.JustDown(cursors.space) && !this.playerAttacking) {
         this.attack();
       }
-    }
-
-    if (this.currentDirection === Direction.UP) {
-      this.weapon.setPosition(0, -(Scale.FACTOR * 32) / 3);
-    } else if (this.currentDirection === Direction.DOWN) {
-      this.weapon.setPosition(0, (Scale.FACTOR * 32) / 3);
-    } else if (this.currentDirection === Direction.LEFT) {
-      this.weapon.setPosition(-(Scale.FACTOR * 32) / 3, 0);
-    } else if (this.currentDirection === Direction.RIGHT) {
-      this.weapon.setPosition((Scale.FACTOR * 32) / 3, 0);
     }
 
     if (this.playerAttacking) {
@@ -190,6 +135,37 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.player.flipX = this.flipX;
   }
 
+  movePlayer(cursors, pointer) {
+    const pixelThresholdForMaxVelocity = 80;
+    this.player.flipX = false;
+    this.flipX = false;
+    this.player.flipX = true;
+    this.flipX = true;
+
+    let intensity = 0;
+
+    // weapon stuff
+    if (this.currentDirection === Direction.UP) {
+      this.weapon.setPosition(0, -(Scale.FACTOR * 32) / 3);
+    } else if (this.currentDirection === Direction.DOWN) {
+      this.weapon.setPosition(0, (Scale.FACTOR * 32) / 3);
+    } else if (this.currentDirection === Direction.LEFT) {
+      this.weapon.setPosition(-(Scale.FACTOR * 32) / 3, 0);
+    } else if (this.currentDirection === Direction.RIGHT) {
+      this.weapon.setPosition((Scale.FACTOR * 32) / 3, 0);
+    }
+
+    // get hypotenuse/distance for velocity > than pixelThresholdForMaxVelocity pixels = full velocity otherwise percentage
+    if (this.movementEnabled) {
+      const distance = Phaser.Math.Distance.Between(pointer.worldX, pointer.worldY, this.x, this.y);
+      if (distance >= pixelThresholdForMaxVelocity) {
+        intensity = 1;
+      } else {
+        intensity = distance / pixelThresholdForMaxVelocity;
+      }
+    }
+  }
+
   attack() {
     if (this.mainPlayer) {
       this.attackAudio.play();
@@ -201,6 +177,10 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
       this.playerAttacking = false;
       this.swordHit = false;
     }, [], this);
+  }
+
+  toggleMovement() {
+    this.movementEnabled = !this.movementEnabled;
   }
 
   cleanUp() {
