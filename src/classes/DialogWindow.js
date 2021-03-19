@@ -197,7 +197,7 @@ export default class DialogWindow {
       this.input.classList.add('chat-bottom');
 
       this.windowWidth = gameSize.width;
-      this.windowHeight = 200;
+      this.windowHeight = 100;
       this.y = gameSize.height - this.windowHeight;
     } else {
       this.input.classList.add('chat-sidebar');
