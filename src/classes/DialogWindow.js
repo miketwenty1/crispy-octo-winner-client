@@ -44,7 +44,7 @@ export default class DialogWindow {
         username: '',
         message: '',
       });
-    }, 5000);
+    }, 30000);
   }
 
   createWindow() {
