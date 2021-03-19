@@ -281,6 +281,7 @@ export default class GameScene extends Phaser.Scene {
         this.socket.emit('sendMessage', message, getCookie('jwt'));
       }
     }
+    document.getElementById('chatInput').blur();
   }
 
   updateMonsterLocations() {
@@ -319,7 +320,7 @@ export default class GameScene extends Phaser.Scene {
   update() {
     this.dialogWindow.update();
     if (this.player) {
-      this.player.update(this.cursors, this.input.activePointer, this);
+      this.player.update(this.cursors, this.input.activePointer);
     }
     // if no change then don't emit event only emit on change so server doesn't get flooded with b.s.
     if (this.player) {
@@ -461,6 +462,7 @@ export default class GameScene extends Phaser.Scene {
       right: 'right',
       space: 'space',
     });
+    this.input.setPollAlways();
   }
 
   addCollisions() {

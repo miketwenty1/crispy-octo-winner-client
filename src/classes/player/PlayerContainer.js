@@ -48,7 +48,7 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.weapon.setScale(Scale.FACTOR * 0.75);
     this.scene.physics.world.enable(this.weapon);
     this.add(this.weapon);
-    this.weapon.alpha = 0;
+    this.weapon.alpha = 1;
     this.createHealthBar();
     this.createUsernameText();
   }
@@ -109,59 +109,51 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     }
 
     if (this.playerAttacking) {
-      if (this.weapon.flipX === true) {
-        this.weapon.angle -= 10;
+      if (this.weapon.flipY === true) {
+        this.weapon.angle -= 70;
       } else {
-        this.weapon.angle += 10;
-      }
-    } else {
-      if (this.currentDirection === Direction.DOWN) {
-        this.weapon.setAngle(-270);
-      } else if (this.currentDirection === Direction.UP) {
-        this.weapon.setAngle(-64);
-      } else {
-        this.weapon.setAngle(0);
-      }
-      this.weapon.flipX = false;
-      if (this.currentDirection === Direction.LEFT) {
-        this.weapon.flipX = true;
+        this.weapon.angle += 70;
       }
     }
     this.updateHealthBar();
     this.updateUsernameTextPosition();
   }
 
-  updateFlipX() {
-    this.player.flipX = this.flipX;
-  }
-
   movePlayer(cursors, pointer) {
-    const pixelThresholdForMaxVelocity = 80;
+    const pixelThresholdForMaxVelocity = 150;
     this.player.flipX = false;
-    this.flipX = false;
-    this.player.flipX = true;
-    this.flipX = true;
 
     let intensity = 0;
-
-    // weapon stuff
-    if (this.currentDirection === Direction.UP) {
-      this.weapon.setPosition(0, -(Scale.FACTOR * 32) / 3);
-    } else if (this.currentDirection === Direction.DOWN) {
-      this.weapon.setPosition(0, (Scale.FACTOR * 32) / 3);
-    } else if (this.currentDirection === Direction.LEFT) {
-      this.weapon.setPosition(-(Scale.FACTOR * 32) / 3, 0);
-    } else if (this.currentDirection === Direction.RIGHT) {
-      this.weapon.setPosition((Scale.FACTOR * 32) / 3, 0);
-    }
 
     // get hypotenuse/distance for velocity > than pixelThresholdForMaxVelocity pixels = full velocity otherwise percentage
     if (this.movementEnabled) {
       const distance = Phaser.Math.Distance.Between(pointer.worldX, pointer.worldY, this.x, this.y);
-      if (distance >= pixelThresholdForMaxVelocity) {
-        intensity = 1;
-      } else {
-        intensity = distance / pixelThresholdForMaxVelocity;
+      if (distance > 15) {
+        if (distance >= pixelThresholdForMaxVelocity) {
+          intensity = 1;
+        } else {
+          intensity = distance / pixelThresholdForMaxVelocity;
+        }
+        const pVelocity = this.velocity * intensity;
+        const swordLengthFromPlayer = 32;
+        // get angle from pointer to player
+        const pointerAngle = (Math.atan2(pointer.worldY - this.y, pointer.worldX - this.x) * 180) / Math.PI;
+        const radian = (pointerAngle * Math.PI) / 180;
+        const yVelocity = Math.sin(radian) * pVelocity;
+        const xVelocity = Math.cos(radian) * pVelocity;
+        const ySword = Math.sin(radian) * swordLengthFromPlayer;
+        const xSword = Math.cos(radian) * swordLengthFromPlayer;
+        this.body.setVelocityY(yVelocity);
+        this.body.setVelocityX(xVelocity);
+        this.weapon.setPosition(xSword, ySword);
+        this.weapon.setAngle(pointerAngle);
+        if (pointerAngle >= -90 && pointerAngle < 90) {
+          this.player.flipX = true;
+          this.weapon.flipY = false;
+        } else {
+          this.player.flipX = false;
+          this.weapon.flipY = true;
+        }
       }
     }
   }
@@ -170,10 +162,10 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     if (this.mainPlayer) {
       this.attackAudio.play();
     }
-    this.weapon.alpha = 1;
+    // this.weapon.alpha = 1;
     this.playerAttacking = true;
     this.scene.time.delayedCall(150, () => {
-      this.weapon.alpha = 0;
+      // this.weapon.alpha = 0;
       this.playerAttacking = false;
       this.swordHit = false;
     }, [], this);
