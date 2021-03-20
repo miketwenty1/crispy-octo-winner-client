@@ -58,12 +58,13 @@ export default class GameScene extends Phaser.Scene {
         if (player.id === otherPlayer.id) {
           otherPlayer.flipX = player.flipX;
           otherPlayer.setPosition(player.x, player.y);
+          // otherPlayer.setWeapon();
           otherPlayer.updateHealthBar();
           otherPlayer.updateFlipX();
           otherPlayer.playerAttacking = player.Attacking;
           otherPlayer.currentDirection = player.currentDirection;
           if (player.playerAttacking) {
-            otherPlayer.attack();
+            otherPlayer.attackAction();
           }
         }
       });
@@ -273,6 +274,7 @@ export default class GameScene extends Phaser.Scene {
       const {
         x, y, flipX, playerAttacking, currentDirection,
       } = this.player;
+      // checking if anything is difference
       if (this.player.oldPosition
         && (x !== this.player.oldPosition.x
           || y !== this.player.oldPosition.y
@@ -282,7 +284,7 @@ export default class GameScene extends Phaser.Scene {
           x, y, flipX, playerAttacking, currentDirection,
         });
       }
-      // save old position data
+
       this.player.oldPosition = {
         x: this.player.x,
         y: this.player.y,

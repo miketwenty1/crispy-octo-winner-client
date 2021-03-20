@@ -192,7 +192,7 @@ export default class DialogWindow {
   resize(gameSize) {
     this.x = gameSize.width;
 
-    if (gameSize.width < 560) {
+    if (gameSize.width < 666) {
       this.input.classList.remove('chat-sidebar');
       this.input.classList.add('chat-bottom');
 

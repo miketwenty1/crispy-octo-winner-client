@@ -124,7 +124,6 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
 
   movePlayer(cursors, pointer) {
     const pixelThresholdForMaxVelocity = 150;
-    this.player.flipX = false;
 
     let intensity = 0;
 
@@ -138,23 +137,25 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
           intensity = distance / pixelThresholdForMaxVelocity;
         }
         const pVelocity = this.velocity * intensity;
-        const swordLengthFromPlayer = 32;
+        const weaponLengthFromPlayer = 32;
         // get angle from pointer to player
         const pointerAngle = (Math.atan2(pointer.worldY - this.y, pointer.worldX - this.x) * 180) / Math.PI;
         const radian = (pointerAngle * Math.PI) / 180;
         const yVelocity = Math.sin(radian) * pVelocity;
         const xVelocity = Math.cos(radian) * pVelocity;
-        const ySword = Math.sin(radian) * swordLengthFromPlayer;
-        const xSword = Math.cos(radian) * swordLengthFromPlayer;
+        const yWeapon = Math.sin(radian) * weaponLengthFromPlayer;
+        const xWeapon = Math.cos(radian) * weaponLengthFromPlayer;
         this.body.setVelocityY(yVelocity);
         this.body.setVelocityX(xVelocity);
-        this.weapon.setPosition(xSword, ySword);
+        this.weapon.setPosition(xWeapon, yWeapon);
         this.weapon.setAngle(pointerAngle);
         if (pointerAngle >= -90 && pointerAngle < 90) {
           this.player.flipX = true;
+          this.flipX = true;
           this.weapon.flipY = false;
         } else {
           this.player.flipX = false;
+          this.flipX = false;
           this.weapon.flipY = true;
         }
       }
@@ -172,6 +173,10 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
       this.playerAttacking = false;
       this.swordHit = false;
     }, [], this);
+  }
+
+  updateFlipX() {
+    this.player.flipX = this.flipX;
   }
 
   toggleMovement() {
