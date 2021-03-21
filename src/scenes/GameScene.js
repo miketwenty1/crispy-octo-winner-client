@@ -65,11 +65,11 @@ export default class GameScene extends Phaser.Scene {
           otherPlayer.updateFlipX();
           otherPlayer.playerAttacking = player.playerAttacking;
           // otherPlayer.currentDirection = player.currentDirection;
-          // if (player.playerAttacking) {
-          //   // otherPlayer.weaponDirection.angle = player.weapon.angle;
-          //   // otherPlayer.attackAction();
-          //   otherPlayer.weaponDirection = player.weaponDirection;
-          // }
+          if (player.playerAttacking) {
+            // otherPlayer.weaponDirection.angle = player.weapon.angle;
+            otherPlayer.attackAction();
+            otherPlayer.weaponDirection = player.weaponDirection;
+          }
           otherPlayer.weaponDirection = player.weaponDirection;
           otherPlayer.updateWeaponDirection();
         }
@@ -313,7 +313,7 @@ export default class GameScene extends Phaser.Scene {
         y: this.player.y,
         flipX: this.player.flipX,
         playerAttacking: this.player.playerAttacking,
-        // weaponAngle: this.player.weaponDirection,
+        weaponAngle: this.player.weaponDirection,
       };
     }
     // freeze monster if in right location

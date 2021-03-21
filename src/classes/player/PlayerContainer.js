@@ -9,8 +9,8 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     // 32 for the pixels of the base sprites, 2.7 to get the scale with 2 to be about 360
     this.velocity = Scale.FACTOR * 32 * ((300 / Scale.FACTOR) / 32);
     this.weaponDirection = {
-      x: 32,
-      y: 32,
+      x: 0,
+      y: 0,
       angle: 0,
       flipY: false,
     };
@@ -138,18 +138,15 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
           const weaponLengthFromPlayer = 32;
 
           // get angle from pointer to player
-          const pointerAngle = (Math.atan2(pointer.worldY - this.y, pointer.worldX - this.x) * 180) / Math.PI;
+          const pointerAngle = Math.trunc((Math.atan2(pointer.worldY - this.y, pointer.worldX - this.x) * 180) / Math.PI);
           const radian = (pointerAngle * Math.PI) / 180;
-          const yVelocity = Math.sin(radian) * pVelocity;
-          const xVelocity = Math.cos(radian) * pVelocity;
+          const yVelocity = Math.trunc(Math.sin(radian) * pVelocity);
+          const xVelocity = Math.trunc(Math.cos(radian) * pVelocity);
           const yWeapon = Math.sin(radian) * weaponLengthFromPlayer;
           const xWeapon = Math.cos(radian) * weaponLengthFromPlayer;
           this.body.setVelocityY(yVelocity);
           this.body.setVelocityX(xVelocity);
           this.weapon.setPosition(xWeapon, yWeapon);
-          if (!this.playerAttacking) {
-            this.weapon.setAngle(pointerAngle);
-          }
 
           if (pointerAngle >= -90 && pointerAngle < 90) {
             this.player.flipX = true;
@@ -164,14 +161,14 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
           // this doesn't effect main player
           this.weaponDirection.x = xWeapon;
           this.weaponDirection.y = yWeapon;
-          this.weaponDirection.angle = pointerAngle;
           this.weaponDirection.flipY = this.weapon.flipY;
+          if (!this.playerAttacking) {
+            this.weapon.setAngle(pointerAngle);
+            this.weaponDirection.angle = pointerAngle;
+          }
         }
       }
     }
-    // if () {
-
-    // }
   }
 
   attackAction() {
