@@ -111,9 +111,9 @@ export default class DialogWindow {
 
   makeInteractive() {
     this.rect.setInteractive();
-    this.rect.on('pointerover', () => {
-      this.chatVisible();
-    });
+    // this.rect.on('pointerover', () => {
+    //   this.chatVisible();
+    // });
 
     this.rect.on('pointerout', () => {
       this.chatInvisible();
