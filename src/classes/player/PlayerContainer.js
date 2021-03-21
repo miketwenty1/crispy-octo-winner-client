@@ -1,6 +1,5 @@
 import * as Phaser from 'phaser';
 import Player from './Player';
-import Direction from '../../utils/direction';
 import { Scale } from '../../utils/utils';
 
 export default class PlayerContainer extends Phaser.GameObjects.Container {
@@ -9,7 +8,12 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.scene = scene;
     // 32 for the pixels of the base sprites, 2.7 to get the scale with 2 to be about 360
     this.velocity = Scale.FACTOR * 32 * ((300 / Scale.FACTOR) / 32);
-    this.currentDirection = Direction.RIGHT;
+    this.weaponDirection = {
+      x: 32,
+      y: 32,
+      angle: 0,
+      flipY: false,
+    };
     this.playerAttacking = false;
     this.flipX = true;
     this.swordHit = false;
@@ -100,22 +104,14 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
 
   // for angular velocity
   // x = r(cos(degrees‎°)), y = r(sin(degrees‎°))
-  update(cursors, pointer, gameScene) {
-    if (this.mainPlayer) {
+  update(cursors, pointer) {
+    if (this.mainPlayer && this.body) {
       // cursor
       this.body.setVelocity(0);
-      this.movePlayer(cursors, pointer, gameScene);
+      this.movePlayer(cursors, pointer);
 
       if (Phaser.Input.Keyboard.JustDown(cursors.space) && !this.playerAttacking) {
         this.attackAction();
-      }
-    }
-
-    if (this.playerAttacking) {
-      if (this.weapon.flipY === true) {
-        this.weapon.angle -= 70;
-      } else {
-        this.weapon.angle += 70;
       }
     }
     this.updateHealthBar();
@@ -123,56 +119,96 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
   }
 
   movePlayer(cursors, pointer) {
-    const pixelThresholdForMaxVelocity = 150;
-
-    let intensity = 0;
-
     // get hypotenuse/distance for velocity > than pixelThresholdForMaxVelocity pixels = full velocity otherwise percentage
     if (this.movementEnabled) {
-      const distance = Phaser.Math.Distance.Between(pointer.worldX, pointer.worldY, this.x, this.y);
-      if (distance > 15) {
-        if (distance >= pixelThresholdForMaxVelocity) {
-          intensity = 1;
-        } else {
-          intensity = distance / pixelThresholdForMaxVelocity;
-        }
-        const pVelocity = this.velocity * intensity;
-        const weaponLengthFromPlayer = 32;
-        // get angle from pointer to player
-        const pointerAngle = (Math.atan2(pointer.worldY - this.y, pointer.worldX - this.x) * 180) / Math.PI;
-        const radian = (pointerAngle * Math.PI) / 180;
-        const yVelocity = Math.sin(radian) * pVelocity;
-        const xVelocity = Math.cos(radian) * pVelocity;
-        const yWeapon = Math.sin(radian) * weaponLengthFromPlayer;
-        const xWeapon = Math.cos(radian) * weaponLengthFromPlayer;
-        this.body.setVelocityY(yVelocity);
-        this.body.setVelocityX(xVelocity);
-        this.weapon.setPosition(xWeapon, yWeapon);
-        this.weapon.setAngle(pointerAngle);
-        if (pointerAngle >= -90 && pointerAngle < 90) {
-          this.player.flipX = true;
-          this.flipX = true;
-          this.weapon.flipY = false;
-        } else {
-          this.player.flipX = false;
-          this.flipX = false;
-          this.weapon.flipY = true;
+      if (pointer.position === pointer.prevPosition) {
+        // do nothing for now everything is the same
+      } else {
+        // calculate new projection of character
+        const pixelThresholdForMaxVelocity = 150;
+        let intensity = 0;
+        const distance = Phaser.Math.Distance.Between(pointer.worldX, pointer.worldY, this.x, this.y);
+        if (distance > 15) {
+          if (distance >= pixelThresholdForMaxVelocity) {
+            intensity = 1;
+          } else {
+            intensity = distance / pixelThresholdForMaxVelocity;
+          }
+          const pVelocity = this.velocity * intensity;
+          const weaponLengthFromPlayer = 32;
+
+          // get angle from pointer to player
+          const pointerAngle = (Math.atan2(pointer.worldY - this.y, pointer.worldX - this.x) * 180) / Math.PI;
+          const radian = (pointerAngle * Math.PI) / 180;
+          const yVelocity = Math.sin(radian) * pVelocity;
+          const xVelocity = Math.cos(radian) * pVelocity;
+          const yWeapon = Math.sin(radian) * weaponLengthFromPlayer;
+          const xWeapon = Math.cos(radian) * weaponLengthFromPlayer;
+          this.body.setVelocityY(yVelocity);
+          this.body.setVelocityX(xVelocity);
+          this.weapon.setPosition(xWeapon, yWeapon);
+          if (!this.playerAttacking) {
+            this.weapon.setAngle(pointerAngle);
+          }
+
+          if (pointerAngle >= -90 && pointerAngle < 90) {
+            this.player.flipX = true;
+            this.flipX = true;
+            this.weapon.flipY = false;
+          } else {
+            this.player.flipX = false;
+            this.flipX = false;
+            this.weapon.flipY = true;
+          }
+          // this is set so other players can pick it up. Otherwise players won't see updates.
+          // this doesn't effect main player
+          this.weaponDirection.x = xWeapon;
+          this.weaponDirection.y = yWeapon;
+          this.weaponDirection.angle = pointerAngle;
+          this.weaponDirection.flipY = this.weapon.flipY;
         }
       }
     }
+    // if () {
+
+    // }
   }
 
   attackAction() {
-    if (this.mainPlayer) {
-      this.attackAudio.play();
+    if (this.playerAttacking === false) {
+      this.playerAttacking = true;
+      if (this.mainPlayer) {
+        this.attackAudio.play();
+      }
+      // this.weapon.alpha = 1;
+      // could be a sweet animation here
+      if (this.weapon.flipY === true) {
+        this.weapon.angle -= 70;
+        this.weaponDirection.angle = this.weapon.angle;
+      } else {
+        this.weapon.angle += 70;
+        this.weaponDirection.angle = this.weapon.angle;
+      }
+      this.scene.time.delayedCall(300, () => {
+        // this.weapon.alpha = 0;
+        this.playerAttacking = false;
+        this.swordHit = false;
+        if (this.weapon.flipY === true) {
+          this.weapon.angle += 70;
+          this.weaponDirection.angle = this.weapon.angle;
+        } else {
+          this.weapon.angle -= 70;
+          this.weaponDirection.angle = this.weapon.angle;
+        }
+      }, [], this);
     }
-    // this.weapon.alpha = 1;
-    this.playerAttacking = true;
-    this.scene.time.delayedCall(150, () => {
-      // this.weapon.alpha = 0;
-      this.playerAttacking = false;
-      this.swordHit = false;
-    }, [], this);
+  }
+
+  updateWeaponDirection() {
+    this.player.weaponDirection = this.weaponDirection;
+    this.weapon.setPosition(this.player.weaponDirection.x, this.player.weaponDirection.y);
+    this.weapon.flipY = this.player.weaponDirection.flipY;
+    this.weapon.setAngle(this.player.weaponDirection.angle);
   }
 
   updateFlipX() {

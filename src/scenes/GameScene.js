@@ -51,6 +51,8 @@ export default class GameScene extends Phaser.Scene {
     });
     this.socket.on('spawnPlayer', (player) => {
       this.createPlayer(player, false);
+      console.log('spawned new player');
+      console.log(player);
     });
     // when any player moves
     this.socket.on('playerMoved', (player) => {
@@ -61,11 +63,15 @@ export default class GameScene extends Phaser.Scene {
           // otherPlayer.setWeapon();
           otherPlayer.updateHealthBar();
           otherPlayer.updateFlipX();
-          otherPlayer.playerAttacking = player.Attacking;
-          otherPlayer.currentDirection = player.currentDirection;
-          if (player.playerAttacking) {
-            otherPlayer.attackAction();
-          }
+          otherPlayer.playerAttacking = player.playerAttacking;
+          // otherPlayer.currentDirection = player.currentDirection;
+          // if (player.playerAttacking) {
+          //   // otherPlayer.weaponDirection.angle = player.weapon.angle;
+          //   // otherPlayer.attackAction();
+          //   otherPlayer.weaponDirection = player.weaponDirection;
+          // }
+          otherPlayer.weaponDirection = player.weaponDirection;
+          otherPlayer.updateWeaponDirection();
         }
       });
     });
@@ -188,7 +194,15 @@ export default class GameScene extends Phaser.Scene {
     window.addEventListener('keydown', (event) => {
       // 13 is the enter key
       if (event.which === 13) {
-        this.sendMessage();
+        if (document.getElementById('chatInput').className === 'chat-input chat-bottom chat-visible'
+      || document.getElementById('chatInput').className === 'chat-input chat-sidebar chat-visible') {
+          this.sendMessage();
+        } else {
+          this.showDialogBox();
+        }
+        // console.log(document.getElementById('chatInput').className);
+        // //
+        // console.log(document.getElementById('chatInput').className);
       // 32 is the spacebar
       } else if (event.which === 32) {
         if (document.activeElement === this.inputMessageField) {
@@ -229,6 +243,15 @@ export default class GameScene extends Phaser.Scene {
       }
     }
     document.getElementById('chatInput').blur();
+    this.dialogWindow.chatInvisible();
+  }
+
+  showDialogBox() {
+    // console.log('send message');
+    if (this.inputMessageField) {
+      this.dialogWindow.chatVisible();
+      document.getElementById('chatInput').focus();
+    }
   }
 
   updateMonsterLocations() {
@@ -272,7 +295,7 @@ export default class GameScene extends Phaser.Scene {
     // if no change then don't emit event only emit on change so server doesn't get flooded with b.s.
     if (this.player) {
       const {
-        x, y, flipX, playerAttacking, currentDirection,
+        x, y, flipX, playerAttacking, weaponDirection,
       } = this.player;
       // checking if anything is difference
       if (this.player.oldPosition
@@ -281,7 +304,7 @@ export default class GameScene extends Phaser.Scene {
           || flipX !== this.player.oldPosition.flipX
           || playerAttacking !== this.player.oldPosition.playerAttacking)) {
         this.socket.emit('playerMovement', {
-          x, y, flipX, playerAttacking, currentDirection,
+          x, y, flipX, playerAttacking, weaponDirection,
         });
       }
 
@@ -290,6 +313,7 @@ export default class GameScene extends Phaser.Scene {
         y: this.player.y,
         flipX: this.player.flipX,
         playerAttacking: this.player.playerAttacking,
+        // weaponAngle: this.player.weaponDirection,
       };
     }
     // freeze monster if in right location
@@ -336,8 +360,10 @@ export default class GameScene extends Phaser.Scene {
       playerObject.username,
     );
     if (!mainPlayer) {
+      console.log('add to otherplayers list');
       this.otherPlayers.add(playerGameObject);
     } else {
+      console.log('set this.player');
       this.player = playerGameObject;
     }
   }
@@ -349,6 +375,7 @@ export default class GameScene extends Phaser.Scene {
     this.monsters.runChildUpdate = true;
     // create an other players group
     this.otherPlayers = this.physics.add.group();
+    // shows updates for player collisions, attack.
     this.otherPlayers.runChildUpdate = true;
   }
 

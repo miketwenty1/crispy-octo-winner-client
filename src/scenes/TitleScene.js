@@ -22,6 +22,7 @@ const loginAsGuestRatio = { width: 0.5, height: 0.40 };
 export default class TitleScene extends Phaser.Scene {
   constructor() {
     super('Title');
+    this.guestButtonClicked = false;
   }
 
   create() {
@@ -76,21 +77,26 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   loginAsGuest() {
-    postData(`${SERVER_URL}/login`, { email: 'guest', password: 'guest' })
-      .then((res) => {
-        if (res.status === 200) {
-          this.scale.removeListener('resize', this.resize);
-          this.startScene('Game');
-        } else {
-          console.log(res);
-          console.log(`did not get a 200 response got ${res.status}, -> ${res.message}`);
-          window.alert('something wrong happened with guest login contact admin');
-        }
-      })
-      .catch((err) => {
-        console.log(`yo there an err for login - ${err.message}`);
-        window.alert('something bizarre happened with guest login ..like wtf');
-      });
+    if (!this.guestButtonClicked) {
+      this.guestButtonClicked = true;
+      postData(`${SERVER_URL}/login`, { email: 'guest', password: 'guest' })
+        .then((res) => {
+          if (res.status === 200) {
+            this.scale.removeListener('resize', this.resize);
+            this.startScene('Game');
+          } else {
+            console.log(res);
+            console.log(`did not get a 200 response got ${res.status}, -> ${res.message}`);
+            window.alert('something wrong happened with guest login contact admin');
+          }
+        })
+        .catch((err) => {
+          console.log(`yo there an err for login - ${err.message}`);
+          window.alert('something bizarre happened with guest login ..like wtf');
+        });
+    } else {
+      console.log('bro do not double click guest button');
+    }
   }
 
   startScene(targetScene) {

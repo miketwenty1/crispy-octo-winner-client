@@ -112,23 +112,11 @@ export default class DialogWindow {
   makeInteractive() {
     this.rect.setInteractive();
     this.rect.on('pointerover', () => {
-      this.input.classList.add('chat-visible');
-      this.input.classList.remove('chat-invisible');
-
-      this.windowAlpha = 0.5;
-      this.borderAlpha = 0.6;
-      this.textAlpha = 1;
-      this.redrawWindow();
+      this.chatVisible();
     });
 
     this.rect.on('pointerout', () => {
-      this.input.classList.remove('chat-visible');
-      this.input.classList.add('chat-invisible');
-
-      this.windowAlpha = 0;
-      this.borderAlpha = 0;
-      this.textAlpha = 0.75;
-      this.redrawWindow();
+      this.chatInvisible();
     });
   }
 
@@ -140,7 +128,7 @@ export default class DialogWindow {
     if (!messageObject.username) {
       message = '';
     } else {
-      message = `${messageObject.username} ${messageObject.message}`;
+      message = `${messageObject.username}: ${messageObject.message}`;
     }
 
     let messageText = this.messageGroup.getFirstDead();
@@ -221,5 +209,26 @@ export default class DialogWindow {
     }
 
     document.body.appendChild(this.input);
+  }
+
+  chatInvisible() {
+    this.input.classList.remove('chat-visible');
+    this.input.classList.add('chat-invisible');
+
+    this.windowAlpha = 0;
+    this.borderAlpha = 0;
+    this.textAlpha = 0.75;
+    this.redrawWindow();
+    document.getElementById('chatInput').blur();
+  }
+
+  chatVisible() {
+    this.input.classList.add('chat-visible');
+    this.input.classList.remove('chat-invisible');
+
+    this.windowAlpha = 0.5;
+    this.borderAlpha = 0.6;
+    this.textAlpha = 1;
+    this.redrawWindow();
   }
 }
