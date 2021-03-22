@@ -3,7 +3,26 @@ import Player from './Player';
 import { Scale } from '../../utils/utils';
 
 export default class PlayerContainer extends Phaser.GameObjects.Container {
-  constructor(scene, x, y, key, frame, attack, health, maxHealth, defense, id, attackAudio, mainPlayer, username) {
+  constructor(
+    scene,
+    x,
+    y,
+    key,
+    frame,
+    attack,
+    health,
+    maxHealth,
+    defense,
+    id,
+    attackAudio,
+    mainPlayer,
+    username,
+    bitcoin,
+    defenseValue,
+    attackValue,
+    items,
+
+  ) {
     super(scene, x, y);
     this.scene = scene;
     // 32 for the pixels of the base sprites, 2.7 to get the scale with 2 to be about 360
@@ -27,6 +46,10 @@ export default class PlayerContainer extends Phaser.GameObjects.Container {
     this.username = username;
     this.frame = frame;
     this.movementEnabled = false;
+    this.bitcoin = bitcoin;
+    this.defenseValue = defenseValue;
+    this.attackValue = attackValue;
+    this.items = items;
 
     // this.setSize(32 * Scale.FACTOR, 32 * Scale.FACTOR);
     this.setSize((Scale.FACTOR * 32 * 0.66), (Scale.FACTOR * 32 * 0.66));

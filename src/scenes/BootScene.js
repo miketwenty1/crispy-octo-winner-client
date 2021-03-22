@@ -23,6 +23,12 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('button2', 'assets/images/ui/blue_button02.png');
     this.load.image('btc', 'assets/images/btc.png');
     this.load.image('background', 'assets/level/background-extruded.png');
+    this.load.image('inventoryShield', 'assets/images/ui/condensation_shield_new.png');
+    this.load.image('inventoryBitcoin', 'assets/images/ui/gold_pile_16.png');
+    this.load.image('inventoryButton', 'assets/images/ui/instructions.png');
+    this.load.image('inventorySword', 'assets/images/ui/infusion.png');
+    this.load.image('inventoryRemove', 'assets/images/ui/prompt_no.png');
+    this.load.image('inventoryHeart', 'assets/images/ui/regeneration_new.png');
   }
 
   loadSpriteSheets() {
@@ -34,7 +40,8 @@ export default class BootScene extends Phaser.Scene {
   }
 
   loadAudio() {
-    this.load.audio('goldAudio', ['assets/audio/Pickup.wav']);
+    this.load.audio('itemAudio', ['assets/audio/Pickup.wav']);
+    this.load.audio('goldAudio', ['assets/audio/coin1.wav']);
     this.load.audio('enemyDeathAudio', ['assets/audio/EnemyDeath.wav']);
     this.load.audio('playerAttackAudio', ['assets/audio/PlayerAttack.wav']);
     this.load.audio('playerDamageAudio', ['assets/audio/PlayerDamage.wav']);
